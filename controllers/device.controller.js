@@ -1,0 +1,16 @@
+import DeviceModel from "../models/device.model.js";
+
+const allDevice = async (req, res, next) => {
+  try {
+    const devices = await DeviceModel.find();
+    res.json({
+      success: true,
+      data: devices,
+      error: null,
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
+export default { allDevice };
