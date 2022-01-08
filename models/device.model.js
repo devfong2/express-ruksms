@@ -36,6 +36,10 @@ const deviceSchema = new mongoose.Schema(
         },
       },
     ],
+    available: {
+      type: Boolean,
+      default: true,
+    },
   },
   { toJSON: { virtuals: true } }
 );
