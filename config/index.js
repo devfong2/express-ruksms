@@ -4,8 +4,9 @@ export default {
   PORT: 4000,
   DB_URI:
     nodeEnv === "production"
-      ? "mongodb://localhost:27017/ruksms-prod"
+      ? "mongodb://mongo:27017/ruksms"
       : "mongodb://localhost:27017/ruksms",
+
   GATEWAY: {
     FCM: "https://fcm.googleapis.com/fcm/send",
     KEY: "key=AAAAA5KQ65k:APA91bGiFqJd1eQjYjAwAzhWyWGITNzqFbQBf52LlDoftKDZ94f86m1u-KIoEuZFfX-zNRvOifWVV_golBw7Aa-Fq7Cv0qHuIgxGianL1x_BfsjMLlDfQ3cb6fggNiaUQXqdfvTJ_-CL",

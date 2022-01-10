@@ -37,7 +37,11 @@ const registerDevice = async (req, res, next) => {
       user = await UserModel.findOne({ apiKey: key });
     }
 
-    const totalDevice = await DeviceModel.find({ userId: user._id });
+    const totalDevice = await DeviceModel.find({
+      user: user._id,
+      available: true,
+    });
+    console.log(totalDevice);
     if (user.devicesLimit && totalDevice.length >= user.devicesLimit) {
       const err = new Error("คุณไม่สามารถเพิ่มอุปกรณ์ได้อีก");
       err.statusCode = 200;
@@ -64,7 +68,7 @@ const registerDevice = async (req, res, next) => {
         {
           ...req.body,
           userID: user.ID,
-          // androidID: req.body.androidId,
+          available: true,
         },
         { new: true }
       );
@@ -80,6 +84,8 @@ const registerDevice = async (req, res, next) => {
       });
       await device.save();
       await device.populate("user");
+    }
+    if (!findDeviceByAndroidId?.available || !findDeviceByAndroidId) {
       req.app.socket.emit("updateDevice", {
         type: "newDevice",
         device,
@@ -147,9 +153,10 @@ const signIn = async (req, res, next) => {
       throw err;
     }
 
-    const deviceOfUser = await DeviceModel.find({ userID: user.ID }).populate(
-      "user"
-    );
+    const deviceOfUser = await DeviceModel.find({
+      userID: user.ID,
+      available: true,
+    }).populate("user");
     if (deviceOfUser.length === 0) {
       const err = new Error(`คุณยังไม่ได้เพิ่มอุปกรณ์ในบัญชีของคุณ`);
       err.statusCode = 200;
