@@ -33,15 +33,16 @@ const registerDevice = async (req, res, next) => {
         throw err;
       }
     } else if (key) {
-      console.log(key);
+      // console.log(req.body);
       user = await UserModel.findOne({ apiKey: key });
+      // console.log(user);
     }
 
     const totalDevice = await DeviceModel.find({
       user: user._id,
       available: true,
     });
-    console.log(totalDevice);
+    // console.log(totalDevice);
     if (user.devicesLimit && totalDevice.length >= user.devicesLimit) {
       const err = new Error("คุณไม่สามารถเพิ่มอุปกรณ์ได้อีก");
       err.statusCode = 200;
@@ -69,6 +70,7 @@ const registerDevice = async (req, res, next) => {
           ...req.body,
           userID: user.ID,
           available: true,
+          user: user._id,
         },
         { new: true }
       );
@@ -85,12 +87,13 @@ const registerDevice = async (req, res, next) => {
       await device.save();
       await device.populate("user");
     }
-    if (!findDeviceByAndroidId?.available || !findDeviceByAndroidId) {
-      req.app.socket.emit("updateDevice", {
-        type: "newDevice",
-        device,
-      });
-    }
+
+    req.app.io.emit("updateDevice", {
+      type: "newDevice",
+      device,
+    });
+
+    // console.log(req.app.socket.id);
 
     // req.app.socket.emit("newmsg", { msg: "Hey mama" });
 
@@ -157,6 +160,7 @@ const signIn = async (req, res, next) => {
       userID: user.ID,
       available: true,
     }).populate("user");
+
     if (deviceOfUser.length === 0) {
       const err = new Error(`คุณยังไม่ได้เพิ่มอุปกรณ์ในบัญชีของคุณ`);
       err.statusCode = 200;
@@ -192,7 +196,7 @@ const signIn = async (req, res, next) => {
       config.JWT_SECRET,
       { expiresIn: "1h" }
     );
-    req.app.socket.emit("updateDevice", {
+    req.app.io.emit("updateDevice", {
       type: "signIn",
       androidId: req.body.androidId,
     });
@@ -215,7 +219,7 @@ const signOut = async (req, res) => {
     { androidId: req.body.androidId },
     { enabled: 0 }
   );
-  req.app.socket.emit("updateDevice", {
+  req.app.io.emit("updateDevice", {
     type: "signOut",
     androidId: req.body.androidId,
   });

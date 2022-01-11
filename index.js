@@ -28,14 +28,9 @@ const io = new Server(httpServer, {
 // eslint-disable-next-line no-undef
 console.log(process.env.NODE_ENV);
 
+app.io = io;
 io.on("connection", function (socket) {
   console.log("connection =>", socket.id);
-  app.socket = socket;
-  socket.emit("newmsg", { msg: "Hey" });
-  // socket.on("join", function (data) {
-  //   console.log(data);
-  //   socket.join(data);
-  // });
 });
 
 app.use(routes);
