@@ -89,6 +89,7 @@ const registerDevice = async (req, res, next) => {
     }
 
     req.app.io.emit("updateDevice", {
+      userId: user._id,
       type: "newDevice",
       device,
     });
@@ -197,6 +198,7 @@ const signIn = async (req, res, next) => {
       { expiresIn: "1h" }
     );
     req.app.io.emit("updateDevice", {
+      userId: user._id,
       type: "signIn",
       androidId: req.body.androidId,
     });
@@ -215,11 +217,13 @@ const signIn = async (req, res, next) => {
 
 const signOut = async (req, res) => {
   console.log(req.body);
-  await DeviceModel.findOneAndUpdate(
+  const device = await DeviceModel.findOneAndUpdate(
     { androidId: req.body.androidId },
     { enabled: 0 }
   );
+  console.log(device);
   req.app.io.emit("updateDevice", {
+    userId: device.user,
     type: "signOut",
     androidId: req.body.androidId,
   });
@@ -241,7 +245,7 @@ const ussdResponse = async (req, res, next) => {
       },
       { new: true }
     );
-    req.app.socket.emit("updateUssd", ussd);
+    req.app.io.emit("updateUssd", ussd);
     res.json({
       success: true,
       data: null,
