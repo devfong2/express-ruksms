@@ -13,6 +13,10 @@ const sendUssdRequest = async (req, res, next) => {
     if (device.enabled === 0) {
       throw new Error("การเชื่อมต่อของอุปกรณ์ขาดหาย");
     }
+
+    if (device.available === false) {
+      throw new Error("device not found");
+    }
     // console.log(device);
     const deviceToken = device.token;
 
