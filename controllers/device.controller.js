@@ -18,7 +18,7 @@ const deleteDevice = async (req, res, next) => {
     //  console.log(req.user);
     await DeviceModel.updateMany(
       { ID: { $in: req.body.selectedDevice } },
-      { available: false }
+      { available: false, enabled: 0 }
     );
     const devices = await DeviceModel.find();
     res.json({

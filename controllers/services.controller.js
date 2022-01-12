@@ -216,12 +216,12 @@ const signIn = async (req, res, next) => {
 };
 
 const signOut = async (req, res) => {
-  console.log(req.body);
+  // console.log(req.body);
   const device = await DeviceModel.findOneAndUpdate(
     { androidId: req.body.androidId },
     { enabled: 0 }
   );
-  console.log(device);
+  // console.log(device);
   req.app.io.emit("updateDevice", {
     userId: device.user,
     type: "signOut",
