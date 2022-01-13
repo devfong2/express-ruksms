@@ -102,7 +102,7 @@ const sendUssdManyRequest = async (req, res, next) => {
       );
     }
     const result = await UssdModel.find({ userID, response: "รอดำเนินการ" });
-    manageSendUssdManyRequest(userID);
+    manageSendUssdManyRequest(userID, req);
 
     res.json({
       success: true,
@@ -114,7 +114,7 @@ const sendUssdManyRequest = async (req, res, next) => {
   }
 };
 
-const manageSendUssdManyRequest = async (userID) => {
+const manageSendUssdManyRequest = async (userID, req) => {
   try {
     let pendingUssd = await UssdModel.find({ userID, response: "รอดำเนินการ" });
     while (pendingUssd.length !== 0) {
@@ -129,9 +129,14 @@ const manageSendUssdManyRequest = async (userID) => {
       // รอส่งข้อความ
       await setTimeOutToSendUssd(device.token, data);
       //ส่งแล้วก้อเปลี่ยนสถานะ
-      await UssdModel.findByIdAndUpdate(pendingUssd[0]._id, {
-        response: "รอผลตอบกลับ",
-      });
+      const ussd = await UssdModel.findByIdAndUpdate(
+        pendingUssd[0]._id,
+        {
+          response: "รอผลตอบกลับ",
+        },
+        { new: true }
+      );
+      req.app.io.emit("updateUssd", ussd);
 
       //เช็คใหม่
       pendingUssd = await UssdModel.find({ userID, response: "รอดำเนินการ" });
