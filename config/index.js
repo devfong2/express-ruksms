@@ -2,10 +2,14 @@
 const nodeEnv = process.env.NODE_ENV;
 export default {
   PORT: 4000,
-  DB_URI:
-    nodeEnv === "production"
-      ? "mongodb://mongo:27017/ruksms"
-      : "mongodb://localhost:27017/ruksms",
+  MONGODB: {
+    URI:
+      nodeEnv === "production"
+        ? "mongodb://node25890-express-ruksms.th.app.ruk-com.cloud:27017/ruksms"
+        : "mongodb://node25890-express-ruksms.th.app.ruk-com.cloud:11185/ruksms",
+    PASSWORD: "MLHiho08137",
+    USERNAME: "admin",
+  },
 
   GATEWAY: {
     FCM: "https://fcm.googleapis.com/fcm/send",
@@ -18,6 +22,6 @@ export default {
     "iOAH3bUMfM7O9lffAt1pYUv92bwSgmf9U451VbSC4dWPv9V50ui4HtVjHHKKnrJL7qMAPUJmKbiZ3HlNSvCCTNdGxHshtsriUb5QU0fKrhU6x8ezzqASxHya0kWaPL6Dnxppqn7fU1yn8fpvuaTkPG18pPRDY1tv5sBEqGuTHE0T2paugJsdk0QdG4XOHSENbqcJDwgRhhET7li3jKHcPx4Qvwt6P2LfQAIW1EvnjXYdF8HjMPxA42s1bLGNWmud",
   IO_CORS:
     nodeEnv === "production"
-      ? "http://production.com"
+      ? "https://demo1.ruksms.com"
       : "http://localhost:3000",
 };
