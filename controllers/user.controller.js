@@ -32,7 +32,12 @@ const createUser = async (req, res, next) => {
 
 const allUser = async (req, res, next) => {
   try {
-    const users = await UserModel.find();
+    let users;
+    if (req.user.isAdmin === 1) {
+      users = await UserModel.find();
+    } else {
+      users = await UserModel.find({ _id: req.user._id });
+    }
     res.json({
       success: true,
       data: users,
