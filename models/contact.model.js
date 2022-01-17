@@ -7,7 +7,7 @@ const contactSchema = new mongoose.Schema({
     enum: [0, 1],
     default: 1,
   },
-  contactsListID: {
+  contactListID: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "contact-list",
     required: true,
