@@ -2,7 +2,7 @@ import TemplateModel from "../models/template.model.js";
 
 const allTemplate = async (req, res, next) => {
   try {
-    const templates = await TemplateModel.find();
+    const templates = await TemplateModel.find({ userID: req.user._id });
     res.json({
       success: true,
       data: templates,

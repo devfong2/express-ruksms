@@ -1,9 +1,9 @@
 import ContactListModel from "../models/contactList.model.js";
-import Contact from "./../models/contact.model.js";
+import ContactModel from "./../models/contact.model.js";
 
 const allContactList = async (req, res, next) => {
   try {
-    const result = await ContactListModel.find();
+    const result = await ContactListModel.find({ userID: req.user._id });
     res.json({
       success: true,
       data: result,
@@ -47,7 +47,7 @@ const updateContactList = async (req, res, next) => {
 const deleteContactList = async (req, res, next) => {
   try {
     const result = await ContactListModel.findByIdAndDelete(req.params.id);
-    await Contact.deleteMany({ userID: req.params.id });
+    await ContactModel.deleteMany({ contactListID: req.params.id });
     res.json({
       success: true,
       data: result,

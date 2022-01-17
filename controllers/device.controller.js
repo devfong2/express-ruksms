@@ -2,7 +2,13 @@ import DeviceModel from "../models/device.model.js";
 
 const allDevice = async (req, res, next) => {
   try {
-    const devices = await DeviceModel.find();
+    // console.log(req.user);
+    let devices;
+    if (req.user.isAdmin === 1) {
+      devices = await DeviceModel.find();
+    } else {
+      devices = await DeviceModel.find({ user: req.user._id });
+    }
     res.json({
       success: true,
       data: devices,
