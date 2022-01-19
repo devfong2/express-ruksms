@@ -69,7 +69,7 @@ const signIn = async (req, res, next) => {
         name: user.name,
       },
       config.JWT_SECRET,
-      { expiresIn: "6h" }
+      { expiresIn: "24h" }
     );
 
     res.json({

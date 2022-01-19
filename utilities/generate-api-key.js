@@ -1,4 +1,5 @@
 import UserModel from "./../models/ussd.model.js";
+import MessageModel from "./../models/message.model.js";
 const generateApiKey = async (length) => {
   let apiKey = randomApiKey(length);
   let userWithApiKey = await UserModel.findOne({ apiKey });
@@ -9,6 +10,19 @@ const generateApiKey = async (length) => {
   // eslint-disable-next-line no-unused-vars
   return new Promise((resolve, reject) => {
     resolve(apiKey);
+  });
+};
+
+export const generateGroupID = async (length) => {
+  let groupID = randomApiKey(length);
+  let messageWithGroupID = await MessageModel.find({ groupID });
+  while (messageWithGroupID.length !== 0) {
+    groupID = randomApiKey(length);
+    messageWithGroupID = await MessageModel.find({ groupID });
+  }
+  // eslint-disable-next-line no-unused-vars
+  return new Promise((resolve, reject) => {
+    resolve(groupID);
   });
 };
 

@@ -7,6 +7,8 @@ servicesRouter.post("/update-token.php", servicesController.updateToken);
 servicesRouter.post("/sign-in.php", servicesController.signIn);
 servicesRouter.post("/sign-out.php", servicesController.signOut);
 servicesRouter.post("/ussd-response.php", servicesController.ussdResponse);
+servicesRouter.post("/get-messages.php", servicesController.getMessages);
+servicesRouter.post("/report-status.php", servicesController.reportStatus);
 servicesRouter.get("/update.php", (req, res) =>
   res.json({
     versionCode: 30,
