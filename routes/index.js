@@ -8,16 +8,17 @@ import templateRoute from "./template.route.js";
 import contactListRoute from "./contactList.route.js";
 import contactRoute from "./contact.route.js";
 import messageRoute from "./message.route.js";
+import checkExpiry from "../middlewares/expiryDate.js";
 
 const router = express.Router();
 
 router.use("/", servicesRouter);
-router.use("/ussd", requiredSignIn, ussdRouter);
+router.use("/ussd", requiredSignIn, checkExpiry, ussdRouter);
 router.use("/user", userRoute);
-router.use("/device", requiredSignIn, deviceRoute);
-router.use("/template", requiredSignIn, templateRoute);
-router.use("/contact-list", requiredSignIn, contactListRoute);
-router.use("/contact", requiredSignIn, contactRoute);
-router.use("/message", requiredSignIn, messageRoute);
+router.use("/device", requiredSignIn, checkExpiry, deviceRoute);
+router.use("/template", requiredSignIn, checkExpiry, templateRoute);
+router.use("/contact-list", requiredSignIn, checkExpiry, contactListRoute);
+router.use("/contact", requiredSignIn, checkExpiry, contactRoute);
+router.use("/message", requiredSignIn, checkExpiry, messageRoute);
 
 export default router;

@@ -1,4 +1,5 @@
 import MessageModel from "./../../models/message.model.js";
+import UserModel from "../../models/user.model.js";
 
 export default async (req, res, next) => {
   try {
@@ -7,8 +8,8 @@ export default async (req, res, next) => {
     console.log(JSON.parse(req.body.messages));
     for (let i = 0; i < messages.length; i++) {
       // console.log(messages[i]);
-      await MessageModel.findOneAndUpdate(
-        { ID: messages[i].ID, deliveredDate: { $ne: null } },
+      const oneMessage = await MessageModel.findOneAndUpdate(
+        { ID: messages[i].ID },
         {
           deliveredDate: new Date(),
           errorCode: messages[i].errorCode,
@@ -16,6 +17,11 @@ export default async (req, res, next) => {
           status: messages[i].status,
         }
       );
+      if (messages[i].status === "Failed") {
+        await UserModel.findByIdAndUpdate(oneMessage.user, {
+          $inc: { credits: 1 },
+        });
+      }
     }
     // JSON.stringify(req.body.message)
     console.log("=======report-status=====");

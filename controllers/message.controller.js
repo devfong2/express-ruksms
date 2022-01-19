@@ -1,16 +1,26 @@
-// mport DeviceModel from "../models/device.model.js"
+import moment from "moment";
 import DeviceModel from "../models/device.model.js";
 import checkDeviceBeforeSend from "../utilities/check-device-before-send.js";
 import { generateGroupID } from "../utilities/generate-api-key.js";
 import processUssdRequest from "../utilities/send-ussd.js";
 import MessageModel from "./../models/message.model.js";
 import SettingModel from "./../models/setting.model.js";
+import UserModel from "../models/user.model.js";
 
 const sendMessage = async (req, res, next) => {
   try {
     const { user } = req;
-    const { messages, prioritize, senders } = req.body;
-
+    const { messages, prioritize, senders, schedule } = req.body;
+    // เช็คเครดิต
+    const present = moment();
+    const timeForSend = moment(schedule);
+    console.log(timeForSend.diff(present, "hours"));
+    if (user.credits !== null && user.credits < messages.length) {
+      const err = new Error("Your credits not enough");
+      err.statusCode = 402;
+      throw err;
+    }
+    //เช็คสถานะเครื่อง
     for (let i = 0; i < senders.length; i++) {
       const device = await DeviceModel.findOne({
         _id: senders[i].device,
@@ -55,6 +65,8 @@ const sendMessage = async (req, res, next) => {
     // console.log(manyMessage);
     const result = await MessageModel.insertMany(manyMessage);
     checkCountDevice(groupID, senders, prioritize);
+    const currentCredit = user.credits - messages.length;
+    await UserModel.findByIdAndUpdate(user._id, { credits: currentCredit });
     res.json({
       success: true,
       data: result,
