@@ -9,7 +9,10 @@ const checkDeviceBeforeSend = (device, simSlot) => {
     }
 
     if (device.enabled === 0) {
-      reject(new Error("Device is disconnected"));
+      reject(new Error(`${device.model} is disconnected`));
+    }
+    if (!device.sims[simSlot]) {
+      reject(new Error(`${device.model} sim ${simSlot + 1} not found`));
     }
     if (!device.sims[simSlot].enabled) {
       reject(new Error(`${device.model} sim ${simSlot + 1} unavailable`));
