@@ -8,7 +8,7 @@ export default async (req, res, next) => {
     console.log(1);
     const { email, password, androidId, model, key } = req.body;
     if (!androidId && !model) {
-      const err = new Error(`ข้อมูลที่ส่งมาเกิดความผิดพลาด`);
+      const err = new Error(`Invalid data`);
       err.statusCode = 200;
       throw err;
     }

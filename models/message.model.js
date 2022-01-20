@@ -20,8 +20,7 @@ const messageSchema = new mongoose.Schema({
   },
   sentDate: {
     type: Date,
-    required: true,
-    default: new Date().toISOString(),
+    default: null,
   },
   deliveredDate: {
     type: Date,

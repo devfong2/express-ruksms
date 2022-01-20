@@ -12,9 +12,20 @@ const sendMessage = async (req, res, next) => {
     const { user } = req;
     const { messages, prioritize, senders, schedule } = req.body;
     // เช็คเครดิต
-    const present = moment();
-    const timeForSend = moment(schedule);
-    console.log(timeForSend.diff(present, "hours"));
+    let present;
+    let timeForSend;
+    if (schedule) {
+      present = moment();
+      timeForSend = moment(schedule);
+      if (timeForSend < present) {
+        throw new Error(
+          "The schedule time must be greater than the current time."
+        );
+      }
+
+      console.log(timeForSend.diff(present, "minutes"));
+    }
+
     if (user.credits !== null && user.credits < messages.length) {
       const err = new Error("Your credits not enough");
       err.statusCode = 402;
@@ -49,6 +60,7 @@ const sendMessage = async (req, res, next) => {
         deviceID: senders[indexDevice].deviceID,
         device: senders[indexDevice].device,
         simSlot: senders[indexDevice].simSlot,
+        status: schedule ? "Scheduled" : "Pending",
       };
       manyMessage.push(obj);
       maxMessageIdValue++;
@@ -64,7 +76,13 @@ const sendMessage = async (req, res, next) => {
     });
     // console.log(manyMessage);
     const result = await MessageModel.insertMany(manyMessage);
-    checkCountDevice(groupID, senders, prioritize);
+    if (schedule) {
+      const minute = timeForSend.diff(present, "minutes");
+      const second = minute * 60 * 1000;
+      waitTimeForSend(user, groupID, senders, prioritize, second);
+    } else {
+      checkCountDeviceAndSend(user, groupID, senders, prioritize);
+    }
     const currentCredit = user.credits - messages.length;
     await UserModel.findByIdAndUpdate(user._id, { credits: currentCredit });
     res.json({
@@ -77,7 +95,18 @@ const sendMessage = async (req, res, next) => {
   }
 };
 
-const checkCountDevice = async (groupID, senders, prioritize) => {
+const waitTimeForSend = (user, groupID, senders, prioritize, second) => {
+  const timer = setTimeout(async () => {
+    await MessageModel.updateMany(
+      { groupID: { $regex: ".*" + groupID + ".*" }, status: "Scheduled" },
+      { status: "Pending" }
+    );
+    checkCountDeviceAndSend(user, groupID, senders, prioritize);
+    clearTimeout(timer);
+  }, second);
+};
+
+const checkCountDeviceAndSend = async (user, groupID, senders, prioritize) => {
   const devices = [];
   senders.map((s) => {
     const sameDevice = devices.find((d) => d === s.device);
@@ -93,10 +122,10 @@ const checkCountDevice = async (groupID, senders, prioritize) => {
       break;
     }
     const obj = {
-      delay: "1", // from user
+      delay: user.delay, // from user
       groupId: `${groupID}.${devices[i]}`,
       prioritize,
-      reportDelivery: 0, // from user
+      reportDelivery: user.reportDelivery, // from user
       sleepTime: null, // from user
     };
     const result = await processUssdRequest(device.token, obj);
