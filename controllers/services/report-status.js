@@ -4,6 +4,11 @@ import UserModel from "../../models/user.model.js";
 export default async (req, res, next) => {
   try {
     console.log("=======report-status=====");
+    if (!req.body.messages) {
+      const err = new Error(`Invalid data`);
+      err.statusCode = 200;
+      throw err;
+    }
     const messages = JSON.parse(req.body.messages);
     console.log(JSON.parse(req.body.messages));
     for (let i = 0; i < messages.length; i++) {

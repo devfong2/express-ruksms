@@ -36,11 +36,15 @@ const userSchema = new mongoose.Schema(
       required: true,
       default: new Date(),
     },
-    lastLogin: Date,
+    lastLogin: {
+      type: Date,
+      required: true,
+      default: new Date(),
+    },
     delay: {
       type: Number,
       required: true,
-      default: 0,
+      default: 1,
     },
     webHook: { type: String, default: null },
     devicesLimit: { type: Number, default: null },
