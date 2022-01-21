@@ -20,5 +20,6 @@ userRoute.put(
   requiredSignIn,
   userController.updatePassword
 );
+userRoute.post("/delete", requiredSignIn, userController.deleteUser);
 
 export default userRoute;
