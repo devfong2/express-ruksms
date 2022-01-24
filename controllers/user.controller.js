@@ -22,6 +22,7 @@ const createUser = async (req, res, next) => {
       email,
       apiKey: await generateApiKey(40),
     };
+    // console.log(obj);
     const user = new UserModel(obj);
     await user.save();
     // console.log(user._id);

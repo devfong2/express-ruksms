@@ -1,8 +1,31 @@
 import ContactModel from "./../models/contact.model.js";
-
+import ContactListModel from "../models/contactList.model.js";
 const allContact = async (req, res, next) => {
   try {
-    const result = await ContactModel.find();
+    const contactList = await ContactListModel.find({ userID: req.user._id });
+    const contactListID = contactList.map((c) => c._id);
+    // console.log(contactListID);
+    const result = await ContactModel.find({
+      contactListID: { $in: contactListID },
+    });
+    res.json({
+      success: true,
+      data: result,
+      error: null,
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
+const findContactWithOption = async (req, res, next) => {
+  try {
+    const { option } = req.body;
+    console.log(req.body);
+    if (!option) {
+      throw new Error("option is required");
+    }
+    const result = await ContactModel.find(option);
     res.json({
       success: true,
       data: result,
@@ -57,4 +80,10 @@ const deleteContact = async (req, res, next) => {
   }
 };
 
-export default { allContact, createContact, updateContact, deleteContact };
+export default {
+  allContact,
+  createContact,
+  updateContact,
+  deleteContact,
+  findContactWithOption,
+};

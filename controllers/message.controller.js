@@ -10,7 +10,7 @@ import UserModel from "../models/user.model.js";
 const sendMessage = async (req, res, next) => {
   try {
     const { user } = req;
-    const { messages, prioritize, senders, schedule } = req.body;
+    const { messages, prioritize, senders, schedule, perMessage } = req.body;
     // เช็คเครดิต
     let present;
     let timeForSend;
@@ -26,7 +26,7 @@ const sendMessage = async (req, res, next) => {
       console.log(timeForSend.diff(present, "minutes"));
     }
 
-    if (user.credits !== null && user.credits < messages.length) {
+    if (user.credits !== null && user.credits < messages.length * perMessage) {
       const err = new Error("Your credits not enough");
       err.statusCode = 402;
       throw err;
@@ -83,7 +83,7 @@ const sendMessage = async (req, res, next) => {
     } else {
       checkCountDeviceAndSend(user, groupID, senders, prioritize);
     }
-    const currentCredit = user.credits - messages.length;
+    const currentCredit = user.credits - messages.length * perMessage;
     await UserModel.findByIdAndUpdate(user._id, { credits: currentCredit });
     res.json({
       success: true,
