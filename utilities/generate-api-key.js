@@ -1,8 +1,9 @@
-import UserModel from "./../models/ussd.model.js";
+import UserModel from "./../models/user.model.js";
 import MessageModel from "./../models/message.model.js";
 const generateApiKey = async (length) => {
   let apiKey = randomApiKey(length);
   let userWithApiKey = await UserModel.findOne({ apiKey });
+  // console.log(userWithApiKey);
   while (userWithApiKey) {
     apiKey = randomApiKey(length);
     userWithApiKey = await UserModel.findOne({ apiKey });

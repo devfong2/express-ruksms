@@ -23,8 +23,9 @@ export default async (req, res, next) => {
         }
       );
       if (messages[i].status === "Failed") {
+        const plusCredit = Math.ceil(oneMessage.message.length / 70);
         await UserModel.findByIdAndUpdate(oneMessage.user, {
-          $inc: { credits: 1 },
+          $inc: { credits: plusCredit },
         });
       }
     }
