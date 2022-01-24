@@ -79,12 +79,13 @@ const sendMessage = async (req, res, next) => {
     if (schedule) {
       const minute = timeForSend.diff(present, "minutes");
       const second = minute * 60 * 1000;
-      waitTimeForSend(user, groupID, senders, prioritize, second);
+      const totalCredits = messages.length * perMessage;
+      waitTimeForSend(user, groupID, senders, prioritize, second, totalCredits);
     } else {
       checkCountDeviceAndSend(user, groupID, senders, prioritize);
+      const currentCredit = user.credits - messages.length * perMessage;
+      await UserModel.findByIdAndUpdate(user._id, { credits: currentCredit });
     }
-    const currentCredit = user.credits - messages.length * perMessage;
-    await UserModel.findByIdAndUpdate(user._id, { credits: currentCredit });
     res.json({
       success: true,
       data: result,
@@ -95,13 +96,22 @@ const sendMessage = async (req, res, next) => {
   }
 };
 
-const waitTimeForSend = (user, groupID, senders, prioritize, second) => {
+const waitTimeForSend = (
+  user,
+  groupID,
+  senders,
+  prioritize,
+  second,
+  totalCredits
+) => {
   const timer = setTimeout(async () => {
     await MessageModel.updateMany(
       { groupID: { $regex: ".*" + groupID + ".*" }, status: "Scheduled" },
       { status: "Pending" }
     );
     checkCountDeviceAndSend(user, groupID, senders, prioritize);
+    const currentCredit = user.credits - totalCredits;
+    await UserModel.findByIdAndUpdate(user._id, { credits: currentCredit });
     clearTimeout(timer);
   }, second);
 };
