@@ -10,6 +10,7 @@ import contactRoute from "./contact.route.js";
 import messageRoute from "./message.route.js";
 import checkExpiry from "../middlewares/expiryDate.js";
 import planRoute from "./plan.route.js";
+import settingRoute from "./setting.route.js";
 
 const router = express.Router();
 
@@ -22,5 +23,6 @@ router.use("/contact-list", requiredSignIn, checkExpiry, contactListRoute);
 router.use("/contact", requiredSignIn, checkExpiry, contactRoute);
 router.use("/message", requiredSignIn, checkExpiry, messageRoute);
 router.use("/plan", requiredSignIn, planRoute);
+router.use("/setting", requiredSignIn, settingRoute);
 
 export default router;
