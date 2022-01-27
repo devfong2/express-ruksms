@@ -27,7 +27,7 @@ const planSchema = new mongoose.Schema({
   },
   totalCycles: {
     type: Number,
-    required: true,
+
     default: 0,
   },
   paypalPlanID: String,

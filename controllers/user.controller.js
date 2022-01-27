@@ -10,6 +10,8 @@ import config from "../config/index.js";
 import createID from "../utilities/create-id.js";
 import { comparePassword, hashPassword } from "../utilities/password.js";
 import generateApiKey from "../utilities/generate-api-key.js";
+// import SettingModel from "../models/setting.model.js";
+// import sendMail from "../utilities/send-mail.js";
 const createUser = async (req, res, next) => {
   try {
     const { name, password, email } = req.body;
@@ -22,16 +24,23 @@ const createUser = async (req, res, next) => {
       email,
       apiKey: await generateApiKey(40),
     };
-    // console.log(obj);
+
     const user = new UserModel(obj);
     await user.save();
-    // console.log(user._id);
-
     res.status(201).json({
       success: true,
       data: user,
       error: null,
     });
+    //------------------------------------
+    // const sett = await SettingModel.findOne({ name: "mailFormat" });
+
+    // await sendMail(
+    //   "Register success ✔️",
+    //   "james02541@gmail.com",
+    //   sett.value.registration.email
+    // );
+    // res.json("success");
   } catch (e) {
     next(e);
   }

@@ -143,4 +143,18 @@ const checkCountDeviceAndSend = async (user, groupID, senders, prioritize) => {
   }
 };
 
-export default { sendMessage };
+const allMessage = async (req, res, next) => {
+  try {
+    const messages = await MessageModel.find().sort({ sentDate: -1 });
+
+    res.json({
+      success: true,
+      data: messages,
+      error: null,
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
+export default { sendMessage, allMessage };
