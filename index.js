@@ -1,5 +1,6 @@
 import express from "express";
 import passport from "passport";
+import path from "path";
 import { Server } from "socket.io";
 import { createServer } from "http";
 // import cors from "cors";
@@ -12,10 +13,14 @@ const app = express();
 
 connectDatabase();
 
+let rootPath = path.resolve();
+rootPath = path.join(rootPath, "public");
+
 // app.use(cors());
 app.use(express.json({ limit: "50MB" }));
 app.use(express.urlencoded({ extended: false }));
 app.use(passport.initialize());
+app.use(express.static(rootPath));
 
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
