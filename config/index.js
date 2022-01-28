@@ -2,6 +2,7 @@
 const nodeEnv = process.env.NODE_ENV;
 export default {
   PORT: 4000,
+  PUBLIC_URL: "http://localhost:4000/",
   MONGODB: {
     URI:
       nodeEnv === "production"

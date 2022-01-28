@@ -12,6 +12,9 @@ import { comparePassword, hashPassword } from "../utilities/password.js";
 import generateApiKey from "../utilities/generate-api-key.js";
 // import SettingModel from "../models/setting.model.js";
 // import sendMail from "../utilities/send-mail.js";
+// import fs from "fs";
+// import path from "path";
+// import handlebars from "handlebars";
 const createUser = async (req, res, next) => {
   try {
     const { name, password, email } = req.body;
@@ -35,10 +38,24 @@ const createUser = async (req, res, next) => {
     //------------------------------------
     // const sett = await SettingModel.findOne({ name: "mailFormat" });
 
+    // const html = fs.readFileSync(
+    //   path.join(path.resolve(), "email/registration.html"),
+    //   {
+    //     encoding: "utf-8",
+    //   }
+    // );
+    // const template = handlebars.compile(html);
+    // const replacements = {
+    //   username: "Pond Plus Plus",
+    //   linkUrl: "https://ruksms.com/en",
+    // };
+    // const htmlToSend = template(replacements);
+    // // console.log(html);
+
     // await sendMail(
     //   "Register success ✔️",
-    //   "james02541@gmail.com",
-    //   sett.value.registration.email
+    //   "tanyawutsaensuk@gmail.com",
+    //   htmlToSend
     // );
     // res.json("success");
   } catch (e) {
