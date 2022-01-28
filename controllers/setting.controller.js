@@ -1,4 +1,5 @@
 import SettingModel from "../models/setting.model.js";
+import config from "../config/index.js";
 import uploadImage, { checkBase64Format } from "../utilities/upload-image.js";
 
 const allSetting = async (req, res, next) => {
@@ -73,6 +74,9 @@ const updateSettingWebSite = async (req, res, next) => {
 const websiteData = async (req, res, next) => {
   try {
     const settings = await SettingModel.findOne({ name: "website" });
+    settings.value.logo = config.PUBLIC_URL + "website/" + settings.value.logo;
+    settings.value.favicon =
+      config.PUBLIC_URL + "website/" + settings.value.favicon;
     res.json({
       success: true,
       data: settings.value,
