@@ -21,5 +21,9 @@ userRoute.put(
   userController.updatePassword
 );
 userRoute.post("/delete", requiredSignIn, userController.deleteUser);
+userRoute.post("/register", userController.register);
+userRoute.post("/reset-password", userController.resetPassword);
+userRoute.post("/verify-token", userController.verifyToken);
+userRoute.post("/confirm-reset-password", userController.confirmResetPassword);
 
 export default userRoute;

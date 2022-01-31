@@ -145,7 +145,14 @@ const checkCountDeviceAndSend = async (user, groupID, senders, prioritize) => {
 
 const allMessage = async (req, res, next) => {
   try {
-    const messages = await MessageModel.find().sort({ sentDate: -1 });
+    let messages;
+    if (req.user.isAdmin === 1) {
+      messages = await MessageModel.find().sort({ sentDate: -1 });
+    } else {
+      messages = await MessageModel.find({ user: req.user._id }).sort({
+        sentDate: -1,
+      });
+    }
 
     res.json({
       success: true,
@@ -157,4 +164,27 @@ const allMessage = async (req, res, next) => {
   }
 };
 
-export default { sendMessage, allMessage };
+const deleteMessage = async (req, res, next) => {
+  try {
+    const { idForDelete } = req.body;
+    await MessageModel.deleteMany({ _id: { $in: idForDelete } });
+    let messages;
+    if (req.user.isAdmin === 1) {
+      messages = await MessageModel.find().sort({ sentDate: -1 });
+    } else {
+      messages = await MessageModel.find({ user: req.user._id }).sort({
+        sentDate: -1,
+      });
+    }
+
+    res.json({
+      success: true,
+      data: messages,
+      error: null,
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
+export default { sendMessage, allMessage, deleteMessage };
