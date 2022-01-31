@@ -10,6 +10,7 @@ export default async (title, recipient, html) => {
       let transporter = nodemailer.createTransport({
         host: mail.value.host,
         port: mail.value.port,
+        secure: false,
         auth: {
           user: mail.value.user, // generated ethereal user
           pass: mail.value.pass, // generated ethereal password

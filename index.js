@@ -1,6 +1,8 @@
 import express from "express";
 import passport from "passport";
 import path from "path";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 import { Server } from "socket.io";
 import { createServer } from "http";
 // import cors from "cors";
@@ -17,6 +19,18 @@ let rootPath = path.resolve();
 rootPath = path.join(rootPath, "public");
 
 // app.use(cors());
+app.set("trust proxy", 1);
+
+const limiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+});
+
+//  apply to all requests
+app.use(limiter);
+
+//ความปลอดภัยของ server
+app.use(helmet());
 app.use(express.json({ limit: "50MB" }));
 app.use(express.urlencoded({ extended: false }));
 app.use(passport.initialize());

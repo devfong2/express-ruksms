@@ -10,15 +10,19 @@ import config from "../config/index.js";
 import createID from "../utilities/create-id.js";
 import { comparePassword, hashPassword } from "../utilities/password.js";
 import generateApiKey from "../utilities/generate-api-key.js";
-// import SettingModel from "../models/setting.model.js";
-// import sendMail from "../utilities/send-mail.js";
-// import fs from "fs";
-// import path from "path";
-// import handlebars from "handlebars";
+import SettingModel from "../models/setting.model.js";
+import sendMail from "../utilities/send-mail.js";
+import fs from "fs";
+import path from "path";
+import handlebars from "handlebars";
 const createUser = async (req, res, next) => {
   try {
     const { name, password, email } = req.body;
     const allUser = await UserModel.find();
+    const findUser = allUser.find((a) => a.email === email);
+    if (findUser) {
+      throw new Error("Email already exist");
+    }
     const ID = await createID(allUser);
     const obj = {
       ID,
@@ -35,29 +39,6 @@ const createUser = async (req, res, next) => {
       data: user,
       error: null,
     });
-    //------------------------------------
-    // const sett = await SettingModel.findOne({ name: "mailFormat" });
-
-    // const html = fs.readFileSync(
-    //   path.join(path.resolve(), "email/registration.html"),
-    //   {
-    //     encoding: "utf-8",
-    //   }
-    // );
-    // const template = handlebars.compile(html);
-    // const replacements = {
-    //   username: "Pond Plus Plus",
-    //   linkUrl: "https://ruksms.com/en",
-    // };
-    // const htmlToSend = template(replacements);
-    // // console.log(html);
-
-    // await sendMail(
-    //   "Register success ✔️",
-    //   "tanyawutsaensuk@gmail.com",
-    //   htmlToSend
-    // );
-    // res.json("success");
   } catch (e) {
     next(e);
   }
@@ -105,6 +86,8 @@ const signIn = async (req, res, next) => {
       { expiresIn: "24h" }
     );
 
+    await UserModel.findByIdAndUpdate(user._id, { lastLogin: new Date() });
+
     res.json({
       success: true,
       data: token,
@@ -132,6 +115,31 @@ const updateUser = async (req, res, next) => {
     const user = await UserModel.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
     });
+    if (req.body.updateCredits) {
+      const html = fs.readFileSync(
+        path.join(path.resolve(), "email/userLimitsUpdate.html"),
+        {
+          encoding: "utf-8",
+        }
+      );
+      const template = handlebars.compile(html);
+      const replacements = {
+        user: user.name,
+        credits: user.credits,
+        devices: user.devicesLimit,
+        contacts: user.contactsLimit,
+        expiryDate: new Date(user.expiryDate).toLocaleString("default", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        }),
+      };
+      const htmlToSend = template(replacements);
+      // console.log(html);
+
+      await sendMail("Upgrade account success 💰", user.email, htmlToSend);
+    }
     res.json({
       success: true,
       data: user,
@@ -206,6 +214,175 @@ const deleteUser = async (req, res, next) => {
   }
 };
 
+const register = async (req, res, next) => {
+  try {
+    const { name, password, email } = req.body;
+    const allUser = await UserModel.find();
+    const findUser = allUser.find((a) => a.email === email);
+    if (findUser) {
+      throw new Error("Email already exist");
+    }
+    const newUser = await SettingModel.findOne({ name: "newUser" });
+
+    const ID = await createID(allUser);
+    const obj = {
+      ID,
+      name,
+      password: await hashPassword(password),
+      email,
+      apiKey: await generateApiKey(40),
+      delay: newUser.value.delay,
+      reportDelivery: newUser.value.reportDelivery,
+      autoRetry: newUser.value.autoRetry,
+      credits: newUser.value.credits,
+      contactsLimit: newUser.value.contacts,
+      devicesLimit: newUser.value.devices,
+      expiryDate: new Date().setDate(
+        new Date().getDate() + newUser.value.expiryAfter
+      ),
+    };
+
+    const user = new UserModel(obj);
+    await user.save();
+    const html = fs.readFileSync(
+      path.join(path.resolve(), "email/registration.html"),
+      {
+        encoding: "utf-8",
+      }
+    );
+    const template = handlebars.compile(html);
+    const replacements = {
+      user: name,
+      server: config.PUBLIC_URL,
+      userEmail: email,
+      password,
+      credits: user.credits,
+      devices: user.devicesLimit,
+      contacts: user.contactsLimit,
+      expiryDate: new Date(user.expiryDate).toLocaleString("default", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }),
+    };
+    const htmlToSend = template(replacements);
+    // console.log(html);
+
+    await sendMail("Register success ✔️", user.email, htmlToSend);
+    res.json({
+      success: true,
+      data: null,
+      error: null,
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
+const resetPassword = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    const user = await UserModel.findOne({ email });
+    if (!user) {
+      throw new Error("Email not found");
+    }
+
+    const html = fs.readFileSync(
+      path.join(path.resolve(), "email/resetPasswordLink.html"),
+      {
+        encoding: "utf-8",
+      }
+    );
+    const token = Jwt.sign(
+      {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+      },
+      config.JWT_SECRET,
+      { expiresIn: "2h" }
+    );
+    const template = handlebars.compile(html);
+    const replacements = {
+      user: user.name,
+      linkReset: config.FRONTEND_URL + "newpassword?token=" + token,
+    };
+    const htmlToSend = template(replacements);
+    // console.log(html);
+
+    await sendMail("Link reset password 🔑", user.email, htmlToSend);
+    res.json({
+      success: true,
+      data: null,
+      error: null,
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
+const verifyToken = async (req, res, next) => {
+  try {
+    const { token } = req.body;
+    const result = Jwt.verify(token, config.JWT_SECRET);
+    const expireDate = new Date(0);
+    expireDate.setUTCSeconds(result.exp);
+    if (expireDate < new Date()) {
+      throw new Error("Link reset password is expired");
+    }
+    // console.log(result);
+    res.json({
+      success: true,
+      data: null,
+      error: null,
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
+const confirmResetPassword = async (req, res, next) => {
+  try {
+    const { token, newPassword } = req.body;
+    const result = Jwt.verify(token, config.JWT_SECRET);
+    const expireDate = new Date(0);
+    expireDate.setUTCSeconds(result.exp);
+    if (expireDate < new Date()) {
+      throw new Error("Link reset password is expired");
+    }
+    const obj = {
+      password: await hashPassword(newPassword),
+    };
+    await UserModel.findByIdAndUpdate(result.id, obj);
+    const html = fs.readFileSync(
+      path.join(path.resolve(), "email/resetPassword.html"),
+      {
+        encoding: "utf-8",
+      }
+    );
+
+    const template = handlebars.compile(html);
+    const replacements = {
+      user: result.name,
+      server: config.PUBLIC_URL,
+      userEmail: result.email,
+      password: newPassword,
+    };
+    const htmlToSend = template(replacements);
+    // console.log(html);
+
+    await sendMail("Reset password success 🔓", result.email, htmlToSend);
+    res.json({
+      success: true,
+      data: null,
+      error: null,
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
 export default {
   createUser,
   allUser,
@@ -214,4 +391,8 @@ export default {
   updateUser,
   updatePassword,
   deleteUser,
+  register,
+  resetPassword,
+  verifyToken,
+  confirmResetPassword,
 };
