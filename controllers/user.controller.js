@@ -253,7 +253,7 @@ const register = async (req, res, next) => {
     const template = handlebars.compile(html);
     const replacements = {
       user: name,
-      server: config.PUBLIC_URL,
+      server: config.IO_CORS,
       userEmail: email,
       password,
       credits: user.credits,
@@ -306,7 +306,7 @@ const resetPassword = async (req, res, next) => {
     const template = handlebars.compile(html);
     const replacements = {
       user: user.name,
-      linkReset: config.FRONTEND_URL + "newpassword?token=" + token,
+      linkReset: config.IO_CORS + "/newpassword?token=" + token,
     };
     const htmlToSend = template(replacements);
     // console.log(html);
@@ -365,7 +365,7 @@ const confirmResetPassword = async (req, res, next) => {
     const template = handlebars.compile(html);
     const replacements = {
       user: result.name,
-      server: config.PUBLIC_URL,
+      server: config.IO_CORS,
       userEmail: result.email,
       password: newPassword,
     };

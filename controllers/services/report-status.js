@@ -1,5 +1,6 @@
 import MessageModel from "./../../models/message.model.js";
 import UserModel from "../../models/user.model.js";
+import updateDashboard from "../../utilities/update-dashboard.js";
 
 export default async (req, res, next) => {
   try {
@@ -23,11 +24,20 @@ export default async (req, res, next) => {
         }
       );
       if (messages[i].status === "Failed") {
+        const user = await UserModel.findById(oneMessage.user);
         const plusCredit = Math.ceil(oneMessage.message.length / 70);
-        await UserModel.findByIdAndUpdate(oneMessage.user, {
-          $inc: { credits: plusCredit },
-        });
+        if (user.credits !== null) {
+          const totalCredits = user.credits + plusCredit;
+          // console.log(user.credits);
+          // console.log(totalCredits);
+          await UserModel.findByIdAndUpdate(oneMessage.user, {
+            credits: totalCredits,
+          });
+        }
       }
+
+      req.user = { _id: oneMessage.user };
+      await updateDashboard(req);
     }
     // JSON.stringify(req.body.message)
     console.log("=======report-status=====");

@@ -1,5 +1,6 @@
 import ContactModel from "./../models/contact.model.js";
 import ContactListModel from "../models/contactList.model.js";
+// import UserModel from "../models/user.model.js";
 const allContact = async (req, res, next) => {
   try {
     const contactList = await ContactListModel.find({ userID: req.user._id });
@@ -38,7 +39,24 @@ const findContactWithOption = async (req, res, next) => {
 
 const createContact = async (req, res, next) => {
   try {
-    const result = await ContactModel.insertMany(req.body.contacts);
+    // console.log(req.user);
+    const { contacts } = req.body;
+    const contactsListOfUser = await ContactListModel.find({
+      userID: req.user._id,
+    });
+    const idContactList = contactsListOfUser.map((c) => c._id);
+    const contactsNet = await ContactModel.find({
+      contactListID: { $in: idContactList },
+    });
+    const contactTotal = contactsNet.length + contacts.length;
+    if (
+      req.user.contactsLimit !== null &&
+      req.user.contactsLimit < contactTotal
+    ) {
+      throw new Error("The list exceeds the limit.Please upgrade your account");
+    }
+    const result = await ContactModel.insertMany(contacts);
+
     res.json({
       success: true,
       data: result,

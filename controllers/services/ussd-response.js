@@ -1,4 +1,6 @@
 import UssdModel from "../../models/ussd.model.js";
+import updateDashboard from "../../utilities/update-dashboard.js";
+
 export default async (req, res, next) => {
   try {
     console.table(req.body);
@@ -17,6 +19,9 @@ export default async (req, res, next) => {
       { new: true }
     );
     req.app.io.emit("updateUssd", ussd);
+    req.user = { _id: ussd.userID };
+    await updateDashboard(req);
+
     res.json({
       success: true,
       data: null,

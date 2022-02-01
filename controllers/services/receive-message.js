@@ -2,6 +2,7 @@ import MessageModel from "../../models/message.model.js";
 import DeviceModel from "../../models/device.model.js";
 import UserModel from "../../models/user.model.js";
 import SettingModel from "../../models/setting.model.js";
+import updateDashboard from "../../utilities/update-dashboard.js";
 export default async (req, res, next) => {
   try {
     const { androidId, userId, messages } = req.body;
@@ -35,6 +36,8 @@ export default async (req, res, next) => {
           deliveredDate: new Date(messages2[i].receivedDate.split(" ")[0]),
         });
         maxMessageIdValue++;
+        req.user = { _id: user._id };
+        await updateDashboard(req);
       }
 
       await SettingModel.findOneAndUpdate(

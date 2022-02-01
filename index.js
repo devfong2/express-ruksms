@@ -5,7 +5,6 @@ import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import { Server } from "socket.io";
 import { createServer } from "http";
-// import cors from "cors";
 import config from "./config/index.js";
 import connectDatabase from "./database/index.js";
 import errorHandler from "./middlewares/errorHandler.js";
@@ -19,7 +18,7 @@ let rootPath = path.resolve();
 rootPath = path.join(rootPath, "public");
 
 // app.use(cors());
-app.set("trust proxy", 1);
+// app.set("trust proxy", 1);
 
 const limiter = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 minutes
