@@ -46,9 +46,14 @@ const sendUssdRequest = async (req, res, next) => {
 
 const allUssd = async (req, res, next) => {
   try {
-    const ussds = await UssdModel.find()
-      .populate("deviceID")
-      .populate("userID");
+    let ussds = [];
+    if (req.user.isAdmin === 1) {
+      ussds = await UssdModel.find().populate("deviceID").populate("userID");
+    } else {
+      ussds = await UssdModel.find({ userID: req.user._id })
+        .populate("deviceID")
+        .populate("userID");
+    }
     res.json({
       success: true,
       data: ussds,

@@ -74,9 +74,10 @@ const updateSettingWebSite = async (req, res, next) => {
 const websiteData = async (req, res, next) => {
   try {
     const settings = await SettingModel.findOne({ name: "website" });
-    settings.value.logo = config.PUBLIC_URL + "website/" + settings.value.logo;
+    settings.value.logo =
+      config.IO_CORS + "/services/website/" + settings.value.logo;
     settings.value.favicon =
-      config.PUBLIC_URL + "website/" + settings.value.favicon;
+      config.IO_CORS + "/services/website/" + settings.value.favicon;
     res.json({
       success: true,
       data: settings.value,

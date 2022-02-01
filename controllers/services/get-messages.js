@@ -21,7 +21,7 @@ export default async (req, res, next) => {
         _id: { $in: idForUpdate },
         status: "Pending",
       },
-      { status: "Sent", sentDate: new Date() }
+      { status: "Queued", sentDate: new Date() }
     );
     res.json({
       success: true,

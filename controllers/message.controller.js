@@ -6,6 +6,7 @@ import processUssdRequest from "../utilities/send-ussd.js";
 import MessageModel from "./../models/message.model.js";
 import SettingModel from "./../models/setting.model.js";
 import UserModel from "../models/user.model.js";
+import updateDashboard from "../utilities/update-dashboard.js";
 
 const sendMessage = async (req, res, next) => {
   try {
@@ -47,12 +48,23 @@ const sendMessage = async (req, res, next) => {
     const groupID = await generateGroupID(50);
     const manyMessage = [];
 
+    // message footer
+    const newUser = await SettingModel.findOne({ name: "newUser" });
+    let messageFooter = "";
+    if (
+      user.contactsLimit !== null &&
+      user.contactsLimit <= 200 &&
+      newUser.value.messageFooter.enable === 1
+    ) {
+      messageFooter = "\n" + newUser.value.messageFooter.message;
+    }
+
     let indexDevice = 0;
     messages.map((m) => {
       const obj = {
         ID: maxMessageIdValue,
         number: m.number,
-        message: m.message,
+        message: m.message + messageFooter,
         groupID: `${groupID}.${senders[indexDevice].device}`,
         prioritize,
         userID: req.user.ID,
@@ -80,12 +92,24 @@ const sendMessage = async (req, res, next) => {
       const minute = timeForSend.diff(present, "minutes");
       const second = minute * 60 * 1000;
       const totalCredits = messages.length * perMessage;
-      waitTimeForSend(user, groupID, senders, prioritize, second, totalCredits);
+      waitTimeForSend(
+        user,
+        groupID,
+        senders,
+        prioritize,
+        second,
+        totalCredits,
+        req
+      );
     } else {
       checkCountDeviceAndSend(user, groupID, senders, prioritize);
-      const currentCredit = user.credits - messages.length * perMessage;
-      await UserModel.findByIdAndUpdate(user._id, { credits: currentCredit });
+      if (user.credits !== null) {
+        const currentCredit = user.credits - messages.length * perMessage;
+        await UserModel.findByIdAndUpdate(user._id, { credits: currentCredit });
+      }
     }
+    await updateDashboard(req);
+
     res.json({
       success: true,
       data: result,
@@ -102,7 +126,8 @@ const waitTimeForSend = (
   senders,
   prioritize,
   second,
-  totalCredits
+  totalCredits,
+  req
 ) => {
   const timer = setTimeout(async () => {
     await MessageModel.updateMany(
@@ -110,8 +135,11 @@ const waitTimeForSend = (
       { status: "Pending" }
     );
     checkCountDeviceAndSend(user, groupID, senders, prioritize);
-    const currentCredit = user.credits - totalCredits;
-    await UserModel.findByIdAndUpdate(user._id, { credits: currentCredit });
+    if (user.credits !== null) {
+      const currentCredit = user.credits - totalCredits;
+      await UserModel.findByIdAndUpdate(user._id, { credits: currentCredit });
+    }
+    await updateDashboard(req);
     clearTimeout(timer);
   }, second);
 };
