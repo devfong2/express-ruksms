@@ -22,7 +22,7 @@ const allContact = async (req, res, next) => {
 const findContactWithOption = async (req, res, next) => {
   try {
     const { option } = req.body;
-    console.log(req.body);
+    // console.log(req.body);
     if (!option) {
       throw new Error("option is required");
     }

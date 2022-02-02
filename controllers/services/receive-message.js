@@ -11,10 +11,10 @@ export default async (req, res, next) => {
       err.statusCode = 200;
       throw err;
     }
-    console.log("=========Receive-message===========");
+    // console.log("=========Receive-message===========");
     const device = await DeviceModel.findOne({ androidId });
     const user = await UserModel.findOne({ ID: userId });
-    console.log(req.body);
+    // console.log(req.body);
     if (user && device && device.available !== false) {
       const messages2 = JSON.parse(messages);
 
@@ -45,7 +45,7 @@ export default async (req, res, next) => {
         { value: maxMessageIdValue }
       );
     }
-    console.log("=========Receive-message===========");
+    // console.log("=========Receive-message===========");
     res.json({
       success: true,
       data: null,

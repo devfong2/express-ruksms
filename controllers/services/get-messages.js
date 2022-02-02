@@ -1,7 +1,7 @@
 import MessageModel from "./../../models/message.model.js";
 export default async (req, res, next) => {
   try {
-    console.log("=======get-message=====");
+    // console.log("=======get-message=====");
     console.table(req.body);
     const { groupId, limit } = req.body;
     if (!groupId) {
@@ -14,7 +14,7 @@ export default async (req, res, next) => {
       status: "Pending",
     }).limit(parseInt(limit));
     // console.log(messages);
-    console.log("=======get-message=====");
+    // console.log("=======get-message=====");
     const idForUpdate = messages.map((m) => m._id);
     await MessageModel.updateMany(
       {

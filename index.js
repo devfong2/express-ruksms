@@ -44,7 +44,7 @@ const io = new Server(httpServer, {
 });
 
 // eslint-disable-next-line no-undef
-console.log(process.env.NODE_ENV);
+// console.log(process.env.NODE_ENV);
 
 app.io = io;
 io.on("connection", function (socket) {

@@ -4,14 +4,14 @@ import updateDashboard from "../../utilities/update-dashboard.js";
 
 export default async (req, res, next) => {
   try {
-    console.log("=======report-status=====");
+    // console.log("=======report-status=====");
     if (!req.body.messages) {
       const err = new Error(`Invalid data`);
       err.statusCode = 200;
       throw err;
     }
     const messages = JSON.parse(req.body.messages);
-    console.log(JSON.parse(req.body.messages));
+    // console.log(JSON.parse(req.body.messages));
     for (let i = 0; i < messages.length; i++) {
       // console.log(messages[i]);
       const oneMessage = await MessageModel.findOneAndUpdate(
@@ -40,14 +40,14 @@ export default async (req, res, next) => {
       await updateDashboard(req);
     }
     // JSON.stringify(req.body.message)
-    console.log("=======report-status=====");
+    // console.log("=======report-status=====");
     res.json({
       success: true,
       data: null,
       error: null,
     });
   } catch (e) {
-    console.log(e);
+    // console.log(e);
     next(e);
   }
 };
