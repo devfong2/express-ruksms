@@ -4,7 +4,7 @@ import DeviceModel from "../../models/device.model.js";
 import config from "../../config/index.js";
 export default async (req, res, next) => {
   try {
-    console.log(3 + "times");
+    // console.log(3 + "times");
 
     const { androidId, userId } = req.body;
     console.table(req.body);

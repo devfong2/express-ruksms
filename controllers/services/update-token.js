@@ -1,7 +1,7 @@
 import DeviceModel from "../../models/device.model.js";
 export default async (req, res, next) => {
   try {
-    console.log(2);
+    // console.log(2);
     const { androidId, token } = req.body;
     if (!androidId && !token) {
       const err = new Error(`Invalid data`);

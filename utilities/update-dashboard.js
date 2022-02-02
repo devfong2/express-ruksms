@@ -7,6 +7,7 @@ export default (req) => {
     const messages = await MessageModel.find({ user: req.user._id });
     const users = await UserModel.find({ isAdmin: { $ne: 1 } });
     const ussds = await UssdModel.find({ userID: req.user._id });
+    const user = await UserModel.findById(req.user._id);
 
     const count = {
       pending: messages.filter((m) => m.status === "Pending").length,
@@ -19,7 +20,7 @@ export default (req) => {
       received: messages.filter((m) => m.status === "Received").length,
       ussdPending: ussds.filter((u) => u.response === "รอดำเนินการ").length,
       ussdSent: ussds.filter((u) => u.response !== "รอดำเนินการ").length,
-      credits: 0,
+      credits: user.credits,
       user: users.length,
     };
     // console.log(count);

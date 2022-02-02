@@ -24,7 +24,7 @@ const sendMessage = async (req, res, next) => {
         );
       }
 
-      console.log(timeForSend.diff(present, "minutes"));
+      // console.log(timeForSend.diff(present, "minutes"));
     }
 
     if (user.credits !== null && user.credits < messages.length * perMessage) {
@@ -152,7 +152,7 @@ const checkCountDeviceAndSend = async (user, groupID, senders, prioritize) => {
       devices.push(s.device);
     }
   });
-  console.log(devices);
+  // console.log(devices);
 
   for (let i = 0; i < devices.length; i++) {
     const device = await DeviceModel.findById(devices[i]);
@@ -166,8 +166,8 @@ const checkCountDeviceAndSend = async (user, groupID, senders, prioritize) => {
       reportDelivery: user.reportDelivery, // from user
       sleepTime: null, // from user
     };
-    const result = await processUssdRequest(device.token, obj);
-    console.log(result.data);
+    await processUssdRequest(device.token, obj);
+    // console.log(result.data);
   }
 };
 

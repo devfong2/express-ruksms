@@ -5,7 +5,7 @@ import config from "../../config/index.js";
 import { comparePassword } from "../../utilities/password.js";
 export default async (req, res, next) => {
   try {
-    console.log(1);
+    // console.log(1);
     const { email, password, androidId, model, key } = req.body;
     if (!androidId && !model) {
       const err = new Error(`Invalid data`);
