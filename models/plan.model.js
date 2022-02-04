@@ -36,6 +36,10 @@ const planSchema = new mongoose.Schema({
     required: true,
     default: 1,
   },
+  sortPhone: {
+    type: Number,
+    default: 0,
+  },
 });
 
 export default mongoose.model("plan", planSchema);

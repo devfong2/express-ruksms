@@ -40,6 +40,10 @@ const deviceSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    maxUssd: {
+      type: Number,
+      default: 0,
+    },
   },
   { toJSON: { virtuals: true } }
 );

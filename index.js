@@ -2,7 +2,7 @@ import express from "express";
 import passport from "passport";
 import path from "path";
 import helmet from "helmet";
-import rateLimit from "express-rate-limit";
+// import rateLimit from "express-rate-limit";
 import { Server } from "socket.io";
 import { createServer } from "http";
 import config from "./config/index.js";
@@ -20,13 +20,12 @@ rootPath = path.join(rootPath, "public");
 // app.use(cors());
 // app.set("trust proxy", 1);
 
-const limiter = rateLimit({
-  windowMs: 1 * 60 * 1000, // 1 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
-});
+// const limiter = rateLimit({
+//   windowMs: 1 * 60 * 1000, // 1 minutes
+//   max: 5000, // limit each IP to 5000 requests per windowMs
+// });
 
-//  apply to all requests
-app.use(limiter);
+// app.use(limiter);
 
 //ความปลอดภัยของ server
 app.use(helmet());

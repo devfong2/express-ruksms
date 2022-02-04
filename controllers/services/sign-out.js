@@ -13,11 +13,13 @@ export default async (req, res) => {
     { enabled: 0 }
   );
   // console.log(device);
-  req.app.io.emit("updateDevice", {
-    userId: device.user,
-    type: "signOut",
-    androidId: req.body.androidId,
-  });
+  if (device) {
+    req.app.io.emit("updateDevice", {
+      userId: device.user,
+      type: "signOut",
+      androidId: req.body.androidId,
+    });
+  }
   res.json({
     success: true,
     data: null,

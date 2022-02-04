@@ -9,6 +9,11 @@ export default async (req, res, next) => {
       throw err;
     }
 
+    const device = await DeviceModel.findOne({ androidId });
+    if (device.token !== token) {
+      await DeviceModel.findOneAndUpdate({ androidId }, { maxUssd: 0 });
+    }
+
     const findDeviceByAndroidId = await DeviceModel.findOneAndUpdate(
       { androidId },
       { token },

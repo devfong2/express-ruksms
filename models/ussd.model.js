@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const ussdSchema = new mongoose.Schema({
-  ID: { type: Number, required: true, unique: true },
+  ID: { type: Number, required: true },
   request: {
     type: String,
     required: true,
