@@ -28,6 +28,6 @@ export default (req) => {
       userId: req.user._id,
       count,
     });
-    resolve(true);
+    resolve(count);
   });
 };
