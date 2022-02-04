@@ -2,7 +2,7 @@ import processUssdRequest from "../utilities/send-ussd.js";
 import UssdModel from "../models/ussd.model.js";
 import DeviceModel from "../models/device.model.js";
 import checkDeviceBeforeSend from "../utilities/check-device-before-send.js";
-import SettingModel from "../models/setting.model.js";
+// import SettingModel from "../models/setting.model.js";
 
 const sendUssdRequest = async (req, res, next) => {
   try {
@@ -11,19 +11,14 @@ const sendUssdRequest = async (req, res, next) => {
     // console.log(device);
     const deviceToken = device.token;
 
-    // const ussds = await UssdModel.find();
-    // const ID = await createID(ussds);
-    const maxUssdId = await SettingModel.findOne({ name: "maxUssdId" });
     const ussd = new UssdModel({
       ...req.body,
-      ID: maxUssdId.value + 1,
+      ID: device.maxUssd + 1,
       sendDate: new Date(),
     });
     await ussd.save();
-    await SettingModel.findOneAndUpdate(
-      { name: "maxUssdId" },
-      { value: ussd.ID }
-    );
+
+    await DeviceModel.findByIdAndUpdate(device._id, { maxUssd: ussd.ID });
     // console.log(ussd);
     const data = {
       ussdId: ussd.ID,
@@ -33,16 +28,28 @@ const sendUssdRequest = async (req, res, next) => {
     await processUssdRequest(deviceToken, data);
     await ussd.populate("deviceID");
     await ussd.populate("userID");
-
+    // changeUssdStatus(ussd, req);
     res.json({
       success: true,
       data: ussd,
       error: null,
     });
   } catch (e) {
+    console.log(e);
     next(e);
   }
 };
+
+// const changeUssdStatus = async (ussdData, req) => {
+//   const ussd = await UssdModel.findByIdAndUpdate(
+//     ussdData._id,
+//     {
+//       response: "รอผลตอบกลับ",
+//     },
+//     { new: true }
+//   );
+//   req.app.io.emit("updateUssd", ussd);
+// };
 
 const allUssd = async (req, res, next) => {
   try {
@@ -67,11 +74,16 @@ const allUssd = async (req, res, next) => {
 const deleteUssd = async (req, res, next) => {
   try {
     await UssdModel.deleteMany({
-      ID: { $in: req.body.selectedUssd },
+      _id: { $in: req.body.selectedUssd },
     });
-    const ussds = await UssdModel.find()
-      .populate("deviceID")
-      .populate("userID");
+    let ussds = [];
+    if (req.user.isAdmin === 1) {
+      ussds = await UssdModel.find().populate("deviceID").populate("userID");
+    } else {
+      ussds = await UssdModel.find({ userID: req.user._id })
+        .populate("deviceID")
+        .populate("userID");
+    }
     res.json({
       success: true,
       data: ussds,
@@ -84,30 +96,35 @@ const deleteUssd = async (req, res, next) => {
 
 const sendUssdManyRequest = async (req, res, next) => {
   try {
-    const { manyUssd, deviceID, simSlot, userID } = req.body;
-    const device = await DeviceModel.findById(deviceID);
+    const { manyUssd } = req.body;
+    const device = await DeviceModel.findById(manyUssd[0].deviceID);
 
-    await checkDeviceBeforeSend(device, simSlot);
+    await checkDeviceBeforeSend(device, manyUssd[0].simSlot);
 
     // console.log(test);
+    let incID = device.maxUssd;
     for (let i = 0; i < manyUssd.length; i++) {
-      const maxUssdId = await SettingModel.findOne({ name: "maxUssdId" });
+      // const maxUssdId = await SettingModel.findOne({ name: "maxUssdId" });
       const ussd = new UssdModel({
-        request: manyUssd[i],
-        userID: userID,
-        deviceID: deviceID,
-        simSlot: simSlot,
-        ID: maxUssdId.value + 1,
+        request: manyUssd[i].request,
+        userID: manyUssd[i].userID,
+        deviceID: manyUssd[i].deviceID,
+        simSlot: manyUssd[i].simSlot,
+        ID: incID,
         sendDate: new Date(),
       });
       await ussd.save();
-      await SettingModel.findOneAndUpdate(
-        { name: "maxUssdId" },
-        { value: ussd.ID }
-      );
+      incID++;
     }
-    const result = await UssdModel.find({ userID, response: "รอดำเนินการ" });
-    manageSendUssdManyRequest(userID, req);
+    await DeviceModel.findByIdAndUpdate(device._id, { maxUssd: incID });
+
+    const result = await UssdModel.find({
+      userID: manyUssd[0].userID,
+      response: "รอดำเนินการ",
+    })
+      .populate("deviceID")
+      .populate("userID");
+    manageSendUssdManyRequest(manyUssd[0].userID, req);
 
     res.json({
       success: true,

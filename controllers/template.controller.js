@@ -31,7 +31,7 @@ const deleteTemplate = async (req, res, next) => {
     await TemplateModel.deleteMany({
       _id: { $in: req.body.selectedID },
     });
-    const templates = await TemplateModel.find();
+    const templates = await TemplateModel.find({ userID: req.user._id });
     res.json({
       success: true,
       data: templates,
