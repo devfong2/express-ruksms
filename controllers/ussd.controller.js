@@ -40,17 +40,6 @@ const sendUssdRequest = async (req, res, next) => {
   }
 };
 
-// const changeUssdStatus = async (ussdData, req) => {
-//   const ussd = await UssdModel.findByIdAndUpdate(
-//     ussdData._id,
-//     {
-//       response: "รอผลตอบกลับ",
-//     },
-//     { new: true }
-//   );
-//   req.app.io.emit("updateUssd", ussd);
-// };
-
 const allUssd = async (req, res, next) => {
   try {
     let ussds = [];
@@ -102,21 +91,23 @@ const sendUssdManyRequest = async (req, res, next) => {
     await checkDeviceBeforeSend(device, manyUssd[0].simSlot);
 
     // console.log(test);
-    let incID = device.maxUssd;
-    for (let i = 0; i < manyUssd.length; i++) {
-      // const maxUssdId = await SettingModel.findOne({ name: "maxUssdId" });
-      const ussd = new UssdModel({
-        request: manyUssd[i].request,
-        userID: manyUssd[i].userID,
-        deviceID: manyUssd[i].deviceID,
-        simSlot: manyUssd[i].simSlot,
-        ID: incID,
-        sendDate: new Date(),
-      });
-      await ussd.save();
-      incID++;
-    }
-    await DeviceModel.findByIdAndUpdate(device._id, { maxUssd: incID });
+    // let incID = device.maxUssd;
+    // for (let i = 0; i < manyUssd.length; i++) {
+    //   // const maxUssdId = await SettingModel.findOne({ name: "maxUssdId" });
+    //   const ussd = new UssdModel({
+    //     request: manyUssd[i].request,
+    //     userID: manyUssd[i].userID,
+    //     deviceID: manyUssd[i].deviceID,
+    //     simSlot: manyUssd[i].simSlot,
+    //     ID: incID,
+    //     sendDate: new Date(),
+    //   });
+    //   await ussd.save();
+    //   incID++;
+    // }
+    // await DeviceModel.findByIdAndUpdate(device._id, { maxUssd: incID });
+
+    await UssdModel.insertMany(manyUssd);
 
     const result = await UssdModel.find({
       userID: manyUssd[0].userID,
@@ -124,7 +115,7 @@ const sendUssdManyRequest = async (req, res, next) => {
     })
       .populate("deviceID")
       .populate("userID");
-    manageSendUssdManyRequest(manyUssd[0].userID, req);
+    // manageSendUssdManyRequest(manyUssd[0].userID, req);
 
     res.json({
       success: true,
@@ -136,53 +127,75 @@ const sendUssdManyRequest = async (req, res, next) => {
   }
 };
 
-const manageSendUssdManyRequest = async (userID, req) => {
+// const manageSendUssdManyRequest = async (userID, req) => {
+//   try {
+//     let pendingUssd = await UssdModel.find({ userID, response: "รอดำเนินการ" });
+//     while (pendingUssd.length !== 0) {
+//       // insert to ussd model
+
+//       const data = {
+//         ussdId: pendingUssd[0].ID,
+//         ussdRequest: pendingUssd[0].request,
+//         simSlot: pendingUssd[0].simSlot,
+//       };
+//       const device = await DeviceModel.findById(pendingUssd[0].deviceID);
+//       // รอส่งข้อความ
+//       await setTimeOutToSendUssd(device.token, data);
+//       //ส่งแล้วก้อเปลี่ยนสถานะ
+//       const ussd = await UssdModel.findByIdAndUpdate(
+//         pendingUssd[0]._id,
+//         {
+//           response: "รอผลตอบกลับ",
+//         },
+//         { new: true }
+//       );
+//       req.app.io.emit("updateUssd", ussd);
+
+//       //เช็คใหม่
+//       pendingUssd = await UssdModel.find({ userID, response: "รอดำเนินการ" });
+//       console.log(pendingUssd.length);
+//     }
+//   } catch (e) {
+//     console.error(e);
+//   }
+// };
+
+// const setTimeOutToSendUssd = async (deviceToken, data) => {
+//   // eslint-disable-next-line no-async-promise-executor
+//   return new Promise(async (resolve, reject) => {
+//     try {
+//       const res = await processUssdRequest(deviceToken, data);
+//       const timer = setTimeout(() => {
+//         resolve(res);
+//         clearTimeout(timer);
+//       }, 1200);
+//     } catch (e) {
+//       reject(e);
+//       console.error(e);
+//     }
+//   });
+// };
+
+const ussdForCheckCarrier = async (req, res, next) => {
   try {
-    let pendingUssd = await UssdModel.find({ userID, response: "รอดำเนินการ" });
-    while (pendingUssd.length !== 0) {
-      // insert to ussd model
-
-      const data = {
-        ussdId: pendingUssd[0].ID,
-        ussdRequest: pendingUssd[0].request,
-        simSlot: pendingUssd[0].simSlot,
-      };
-      const device = await DeviceModel.findById(pendingUssd[0].deviceID);
-      // รอส่งข้อความ
-      await setTimeOutToSendUssd(device.token, data);
-      //ส่งแล้วก้อเปลี่ยนสถานะ
-      const ussd = await UssdModel.findByIdAndUpdate(
-        pendingUssd[0]._id,
-        {
-          response: "รอผลตอบกลับ",
-        },
-        { new: true }
-      );
-      req.app.io.emit("updateUssd", ussd);
-
-      //เช็คใหม่
-      pendingUssd = await UssdModel.find({ userID, response: "รอดำเนินการ" });
-      console.log(pendingUssd.length);
-    }
+    const ussds = await UssdModel.find({ userID: req.user._id }).populate(
+      "deviceID"
+    );
+    const ussds2 = [];
+    ussds.map((u) => {
+      if (u.request.includes("*933*")) {
+        ussds2.push(u);
+      }
+      return u;
+    });
+    res.json({
+      success: true,
+      data: ussds2,
+      error: null,
+    });
   } catch (e) {
-    console.error(e);
+    next(e);
   }
-};
-
-const setTimeOutToSendUssd = async (deviceToken, data) => {
-  // eslint-disable-next-line no-async-promise-executor
-  return new Promise(async (resolve, reject) => {
-    try {
-      const res = await processUssdRequest(deviceToken, data);
-      const timer = setTimeout(() => {
-        resolve(res);
-        clearTimeout(timer);
-      }, 1200);
-    } catch (e) {
-      reject(e);
-      console.error(e);
-    }
-  });
 };
 
 export default {
@@ -190,4 +203,5 @@ export default {
   allUssd,
   deleteUssd,
   sendUssdManyRequest,
+  ussdForCheckCarrier,
 };

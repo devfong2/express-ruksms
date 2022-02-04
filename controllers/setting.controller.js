@@ -1,6 +1,7 @@
 import SettingModel from "../models/setting.model.js";
 import config from "../config/index.js";
 import uploadImage, { checkBase64Format } from "../utilities/upload-image.js";
+import updateDashboard from "../utilities/update-dashboard.js";
 
 const allSetting = async (req, res, next) => {
   try {
@@ -88,4 +89,24 @@ const websiteData = async (req, res, next) => {
   }
 };
 
-export default { allSetting, updateSetting, updateSettingWebSite, websiteData };
+const dashBoardData = async (req, res, next) => {
+  try {
+    const count = await updateDashboard(req);
+
+    res.json({
+      success: true,
+      data: count,
+      error: null,
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
+export default {
+  allSetting,
+  updateSetting,
+  updateSettingWebSite,
+  websiteData,
+  dashBoardData,
+};

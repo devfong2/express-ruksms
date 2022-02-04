@@ -5,6 +5,7 @@ const ussdRouter = express.Router();
 ussdRouter.post("/send-request", ussdController.sendUssdRequest);
 ussdRouter.post("/send-many-request", ussdController.sendUssdManyRequest);
 ussdRouter.get("/", ussdController.allUssd);
+ussdRouter.get("/check-carrier", ussdController.ussdForCheckCarrier);
 ussdRouter.post("/delete", ussdController.deleteUssd);
 
 export default ussdRouter;
