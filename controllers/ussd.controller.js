@@ -43,10 +43,10 @@ const sendUssdRequest = async (req, res, next) => {
 const allUssd = async (req, res, next) => {
   try {
     let ussds = [];
-    if (req.user.isAdmin === 1) {
+    if (req.params.id === "all") {
       ussds = await UssdModel.find().populate("deviceID").populate("userID");
     } else {
-      ussds = await UssdModel.find({ userID: req.user._id })
+      ussds = await UssdModel.find({ userID: req.params.id })
         .populate("deviceID")
         .populate("userID");
     }
@@ -62,17 +62,16 @@ const allUssd = async (req, res, next) => {
 
 const deleteUssd = async (req, res, next) => {
   try {
+    const { selectedUssd } = req.body;
     await UssdModel.deleteMany({
-      _id: { $in: req.body.selectedUssd },
+      _id: { $in: selectedUssd },
+      userID: req.user._id,
     });
-    let ussds = [];
-    if (req.user.isAdmin === 1) {
-      ussds = await UssdModel.find().populate("deviceID").populate("userID");
-    } else {
-      ussds = await UssdModel.find({ userID: req.user._id })
-        .populate("deviceID")
-        .populate("userID");
-    }
+
+    const ussds = await UssdModel.find({ userID: req.user._id })
+      .populate("deviceID")
+      .populate("userID");
+
     res.json({
       success: true,
       data: ussds,
@@ -90,32 +89,7 @@ const sendUssdManyRequest = async (req, res, next) => {
 
     await checkDeviceBeforeSend(device, manyUssd[0].simSlot);
 
-    // console.log(test);
-    // let incID = device.maxUssd;
-    // for (let i = 0; i < manyUssd.length; i++) {
-    //   // const maxUssdId = await SettingModel.findOne({ name: "maxUssdId" });
-    //   const ussd = new UssdModel({
-    //     request: manyUssd[i].request,
-    //     userID: manyUssd[i].userID,
-    //     deviceID: manyUssd[i].deviceID,
-    //     simSlot: manyUssd[i].simSlot,
-    //     ID: incID,
-    //     sendDate: new Date(),
-    //   });
-    //   await ussd.save();
-    //   incID++;
-    // }
-    // await DeviceModel.findByIdAndUpdate(device._id, { maxUssd: incID });
-
-    await UssdModel.insertMany(manyUssd);
-
-    const result = await UssdModel.find({
-      userID: manyUssd[0].userID,
-      response: "รอดำเนินการ",
-    })
-      .populate("deviceID")
-      .populate("userID");
-    // manageSendUssdManyRequest(manyUssd[0].userID, req);
+    const result = await UssdModel.insertMany(manyUssd);
 
     res.json({
       success: true,
@@ -127,12 +101,19 @@ const sendUssdManyRequest = async (req, res, next) => {
   }
 };
 
-const startSendUssdManyRequest = async (req, res, next) => {
+const getPendingUssd = async (req, res, next) => {
   try {
-    manageSendUssdManyRequest(req.user._id, req);
+    const result = await UssdModel.find({
+      userID: req.user._id,
+      response: "รอดำเนินการ",
+    })
+      .populate("deviceID")
+      .populate("userID");
+    manageSendUssdManyRequest(req);
+
     res.json({
       success: true,
-      data: null,
+      data: result,
       error: null,
     });
   } catch (e) {
@@ -140,12 +121,13 @@ const startSendUssdManyRequest = async (req, res, next) => {
   }
 };
 
-const manageSendUssdManyRequest = async (userID, req) => {
+const manageSendUssdManyRequest = async (req) => {
   try {
-    let pendingUssd = await UssdModel.find({ userID, response: "รอดำเนินการ" });
+    let pendingUssd = await UssdModel.find({
+      userID: req.user._id,
+      response: "รอดำเนินการ",
+    }).limit(10);
     while (pendingUssd.length !== 0) {
-      // insert to ussd model
-
       const data = {
         ussdId: pendingUssd[0].ID,
         ussdRequest: pendingUssd[0].request,
@@ -165,8 +147,11 @@ const manageSendUssdManyRequest = async (userID, req) => {
       req.app.io.emit("updateUssd", ussd);
 
       //เช็คใหม่
-      pendingUssd = await UssdModel.find({ userID, response: "รอดำเนินการ" });
-      console.log(pendingUssd.length);
+      pendingUssd = await UssdModel.find({
+        userID: req.user._id,
+        response: "รอดำเนินการ",
+      }).limit(10);
+      // console.log(pendingUssd.length);
     }
   } catch (e) {
     console.error(e);
@@ -217,5 +202,5 @@ export default {
   deleteUssd,
   sendUssdManyRequest,
   ussdForCheckCarrier,
-  startSendUssdManyRequest,
+  getPendingUssd,
 };
