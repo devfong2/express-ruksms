@@ -127,54 +127,67 @@ const sendUssdManyRequest = async (req, res, next) => {
   }
 };
 
-// const manageSendUssdManyRequest = async (userID, req) => {
-//   try {
-//     let pendingUssd = await UssdModel.find({ userID, response: "รอดำเนินการ" });
-//     while (pendingUssd.length !== 0) {
-//       // insert to ussd model
+const startSendUssdManyRequest = async (req, res, next) => {
+  try {
+    manageSendUssdManyRequest(req.user._id, req);
+    res.json({
+      success: true,
+      data: null,
+      error: null,
+    });
+  } catch (e) {
+    next(e);
+  }
+};
 
-//       const data = {
-//         ussdId: pendingUssd[0].ID,
-//         ussdRequest: pendingUssd[0].request,
-//         simSlot: pendingUssd[0].simSlot,
-//       };
-//       const device = await DeviceModel.findById(pendingUssd[0].deviceID);
-//       // รอส่งข้อความ
-//       await setTimeOutToSendUssd(device.token, data);
-//       //ส่งแล้วก้อเปลี่ยนสถานะ
-//       const ussd = await UssdModel.findByIdAndUpdate(
-//         pendingUssd[0]._id,
-//         {
-//           response: "รอผลตอบกลับ",
-//         },
-//         { new: true }
-//       );
-//       req.app.io.emit("updateUssd", ussd);
+const manageSendUssdManyRequest = async (userID, req) => {
+  try {
+    let pendingUssd = await UssdModel.find({ userID, response: "รอดำเนินการ" });
+    while (pendingUssd.length !== 0) {
+      // insert to ussd model
 
-//       //เช็คใหม่
-//       pendingUssd = await UssdModel.find({ userID, response: "รอดำเนินการ" });
-//       console.log(pendingUssd.length);
-//     }
-//   } catch (e) {
-//     console.error(e);
-//   }
-// };
+      const data = {
+        ussdId: pendingUssd[0].ID,
+        ussdRequest: pendingUssd[0].request,
+        simSlot: pendingUssd[0].simSlot,
+      };
+      const device = await DeviceModel.findById(pendingUssd[0].deviceID);
+      // รอส่งข้อความ
+      await setTimeOutToSendUssd(device.token, data);
+      //ส่งแล้วก้อเปลี่ยนสถานะ
+      const ussd = await UssdModel.findByIdAndUpdate(
+        pendingUssd[0]._id,
+        {
+          response: "รอผลตอบกลับ",
+        },
+        { new: true }
+      );
+      req.app.io.emit("updateUssd", ussd);
 
-// const setTimeOutToSendUssd = async (deviceToken, data) => {
-//   // eslint-disable-next-line no-async-promise-executor
-//   return new Promise(async (resolve, reject) => {
-//     try {
-//       const res = await processUssdRequest(deviceToken, data);
-//       const timer = setTimeout(() => {
-//         resolve(res);
-//         clearTimeout(timer);
-//       }, 1200);
-//     } catch (e) {
-//       reject(e);
-//       console.error(e);
-//     }
-//   });
-// };
+      //เช็คใหม่
+      pendingUssd = await UssdModel.find({ userID, response: "รอดำเนินการ" });
+      console.log(pendingUssd.length);
+    }
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+const setTimeOutToSendUssd = async (deviceToken, data) => {
+  // eslint-disable-next-line no-async-promise-executor
+  return new Promise(async (resolve, reject) => {
+    try {
+      const res = await processUssdRequest(deviceToken, data);
+      const timer = setTimeout(() => {
+        resolve(res);
+        clearTimeout(timer);
+      }, 1200);
+    } catch (e) {
+      reject(e);
+      console.error(e);
+    }
+  });
+};
 
 const ussdForCheckCarrier = async (req, res, next) => {
   try {
@@ -204,4 +217,5 @@ export default {
   deleteUssd,
   sendUssdManyRequest,
   ussdForCheckCarrier,
+  startSendUssdManyRequest,
 };
