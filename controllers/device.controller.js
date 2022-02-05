@@ -43,4 +43,42 @@ const deleteDevice = async (req, res, next) => {
   }
 };
 
-export default { allDevice, deleteDevice };
+const findDeviceById = async (req, res, next) => {
+  try {
+    const device = await DeviceModel.findOne({
+      user: req.user._id,
+      _id: req.params.id,
+    });
+    if (!device) {
+      throw new Error("Device not found");
+    }
+    res.json({
+      success: true,
+      data: device,
+      error: null,
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
+const updateDeviceById = async (req, res, next) => {
+  try {
+    const device = await DeviceModel.findOneAndUpdate(
+      { user: req.user._id, _id: req.params.id },
+      { maxUssd: req.body.maxUssd }
+    );
+    if (!device) {
+      throw new Error("Device not found");
+    }
+    res.json({
+      success: true,
+      data: device,
+      error: null,
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
+export default { allDevice, deleteDevice, findDeviceById, updateDeviceById };
