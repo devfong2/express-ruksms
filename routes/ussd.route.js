@@ -6,7 +6,7 @@ ussdRouter.post("/send-request", ussdController.sendUssdRequest);
 ussdRouter.post("/send-many-request", ussdController.sendUssdManyRequest);
 ussdRouter.get("/user/:id", ussdController.allUssd);
 ussdRouter.get("/check-carrier", ussdController.ussdForCheckCarrier);
-ussdRouter.get("/pending-ussd", ussdController.getPendingUssd);
+ussdRouter.get("/start-send-pending-ussd", ussdController.startSendPendingUssd);
 ussdRouter.post("/delete", ussdController.deleteUssd);
 
 export default ussdRouter;

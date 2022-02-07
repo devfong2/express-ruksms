@@ -4,24 +4,48 @@ import UssdModel from "../models/ussd.model.js";
 export default (req) => {
   // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve) => {
-    const messages = await MessageModel.find({ user: req.user._id });
-    const users = await UserModel.find({ isAdmin: { $ne: 1 } });
-    const ussds = await UssdModel.find({ userID: req.user._id });
-    const user = await UserModel.findById(req.user._id);
+    const [
+      messagesPending,
+      messagesScheduled,
+      messagesQueued,
+      messagesSent,
+      messagesFailed,
+      messagesReceived,
+      ussdPending,
+      ussdSent,
+      users,
+      user,
+    ] = await Promise.all([
+      MessageModel.find({ user: req.user._id, status: "Pending" }).count(),
+      MessageModel.find({ user: req.user._id, status: "Scheduled" }).count(),
+      MessageModel.find({ user: req.user._id, status: "Queued" }).count(),
+      MessageModel.find({
+        user: req.user._id,
+        status: { $in: ["Sent", "Delivered"] },
+      }).count(),
+      MessageModel.find({ user: req.user._id, status: "Failed" }).count(),
+      MessageModel.find({ user: req.user._id, status: "Received" }).count(),
+      UssdModel.find({ userID: req.user._id, response: "รอดำเนินการ" }).count(),
+      UssdModel.find({
+        userID: req.user._id,
+        response: { $ne: "รอดำเนินการ" },
+      }).count(),
+      UserModel.find({ isAdmin: { $ne: 1 } }).count(),
+      UserModel.findById(req.user._id),
+    ]);
+    // console.log(messagesPending);
 
     const count = {
-      pending: messages.filter((m) => m.status === "Pending").length,
-      scheduled: messages.filter((m) => m.status === "Scheduled").length,
-      queued: messages.filter((m) => m.status === "Queued").length,
-      sent: messages.filter(
-        (m) => m.status === "Sent" || m.status === "Delivered"
-      ).length,
-      failed: messages.filter((m) => m.status === "Failed").length,
-      received: messages.filter((m) => m.status === "Received").length,
-      ussdPending: ussds.filter((u) => u.response === "รอดำเนินการ").length,
-      ussdSent: ussds.filter((u) => u.response !== "รอดำเนินการ").length,
+      pending: messagesPending,
+      scheduled: messagesScheduled,
+      queued: messagesQueued,
+      sent: messagesSent,
+      failed: messagesFailed,
+      received: messagesReceived,
+      ussdPending,
+      ussdSent,
       credits: user.credits,
-      user: users.length,
+      user: users,
     };
     // console.log(count);
     req.app.io.emit("updateDashboard", {

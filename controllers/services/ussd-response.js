@@ -3,7 +3,7 @@ import updateDashboard from "../../utilities/update-dashboard.js";
 
 export default async (req, res, next) => {
   try {
-    console.table(req.body);
+    // console.table(req.body);
     const { androidId, userId, ussdId, response } = req.body;
     if (!androidId && !userId && !ussdId && !response) {
       const err = new Error(`Invalid data`);
