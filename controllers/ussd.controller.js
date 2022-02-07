@@ -1,3 +1,4 @@
+// import escapeStringRegexp from "escape-string-regexp";
 import processUssdRequest from "../utilities/send-ussd.js";
 import UssdModel from "../models/ussd.model.js";
 import DeviceModel from "../models/device.model.js";
@@ -43,10 +44,16 @@ const sendUssdRequest = async (req, res, next) => {
 const allUssd = async (req, res, next) => {
   try {
     let ussds = [];
-    if (req.params.id === "all") {
-      ussds = await UssdModel.find().populate("deviceID").populate("userID");
+    if (req.user.isAdmin === 1) {
+      if (req.params.id === "all") {
+        ussds = await UssdModel.find().populate("deviceID").populate("userID");
+      } else {
+        ussds = await UssdModel.find({ userID: req.params.id })
+          .populate("deviceID")
+          .populate("userID");
+      }
     } else {
-      ussds = await UssdModel.find({ userID: req.params.id })
+      ussds = await UssdModel.find({ userID: req.user._id })
         .populate("deviceID")
         .populate("userID");
     }
@@ -90,6 +97,7 @@ const sendUssdManyRequest = async (req, res, next) => {
     await checkDeviceBeforeSend(device, manyUssd[0].simSlot);
 
     const result = await UssdModel.insertMany(manyUssd);
+    // console.log(result);
 
     res.json({
       success: true,
@@ -101,19 +109,13 @@ const sendUssdManyRequest = async (req, res, next) => {
   }
 };
 
-const getPendingUssd = async (req, res, next) => {
+const startSendPendingUssd = async (req, res, next) => {
   try {
-    const result = await UssdModel.find({
-      userID: req.user._id,
-      response: "รอดำเนินการ",
-    })
-      .populate("deviceID")
-      .populate("userID");
     manageSendUssdManyRequest(req);
 
     res.json({
       success: true,
-      data: result,
+      data: null,
       error: null,
     });
   } catch (e) {
@@ -176,16 +178,35 @@ const setTimeOutToSendUssd = async (deviceToken, data) => {
 
 const ussdForCheckCarrier = async (req, res, next) => {
   try {
-    const ussds = await UssdModel.find({ userID: req.user._id }).populate(
-      "deviceID"
-    );
+    const { carrier } = req.query;
+    let start = /727/;
+    let startWith = "*933*";
+    switch (carrier) {
+      case "AIS":
+        start = /727/;
+        startWith = "*727*";
+        break;
+      case "D-TAC":
+        start = /102/;
+        startWith = "*102*";
+        break;
+      case "TRUEMOVE-H":
+        start = /933/;
+        startWith = "*933*";
+        break;
+    }
+    const ussds = await UssdModel.find({
+      userID: req.user._id,
+      request: start,
+    });
     const ussds2 = [];
     ussds.map((u) => {
-      if (u.request.includes("*933*")) {
+      if (u.request.includes(startWith)) {
         ussds2.push(u);
       }
       return u;
     });
+
     res.json({
       success: true,
       data: ussds2,
@@ -202,5 +223,5 @@ export default {
   deleteUssd,
   sendUssdManyRequest,
   ussdForCheckCarrier,
-  getPendingUssd,
+  startSendPendingUssd,
 };
