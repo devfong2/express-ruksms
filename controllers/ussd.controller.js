@@ -44,22 +44,36 @@ const sendUssdRequest = async (req, res, next) => {
 const allUssd = async (req, res, next) => {
   try {
     let ussds = [];
+    let totalItems = 0;
+    const { id, page } = req.query;
+    console.log(page);
     if (req.user.isAdmin === 1) {
-      if (req.params.id === "all") {
-        ussds = await UssdModel.find().populate("deviceID").populate("userID");
-      } else {
-        ussds = await UssdModel.find({ userID: req.params.id })
+      if (id === "all") {
+        ussds = await UssdModel.find()
           .populate("deviceID")
-          .populate("userID");
+          .populate("userID")
+          .limit(15)
+          .skip(page * 15);
+        totalItems = await UssdModel.find().count();
+      } else {
+        ussds = await UssdModel.find({ userID: id })
+          .populate("deviceID")
+          .populate("userID")
+          .limit(15)
+          .skip(page * 15);
+        totalItems = await UssdModel.find({ userID: id }).count();
       }
     } else {
       ussds = await UssdModel.find({ userID: req.user._id })
         .populate("deviceID")
-        .populate("userID");
+        .populate("userID")
+        .limit(15)
+        .skip(page * 15);
+      totalItems = await UssdModel.find({ userID: req.user._id }).count();
     }
     res.json({
       success: true,
-      data: ussds,
+      data: { ussds, totalItems },
       error: null,
     });
   } catch (e) {
