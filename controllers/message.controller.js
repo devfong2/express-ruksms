@@ -198,7 +198,8 @@ const allMessage = async (req, res, next) => {
   try {
     let messages;
     if (req.user.isAdmin === 1) {
-      messages = await MessageModel.find().sort({ sentDate: -1 });
+      const { id } = req.query;
+      messages = await MessageModel.find({ user: id }).sort({ sentDate: -1 });
     } else {
       messages = await MessageModel.find({ user: req.user._id }).sort({
         sentDate: -1,
