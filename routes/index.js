@@ -11,6 +11,7 @@ import messageRoute from "./message.route.js";
 import checkExpiry from "../middlewares/expiryDate.js";
 import planRoute from "./plan.route.js";
 import settingRoute from "./setting.route.js";
+import subscriptionRoute from "./subscription.route.js";
 
 const router = express.Router();
 
@@ -24,5 +25,6 @@ router.use("/contact", requiredSignIn, checkExpiry, contactRoute);
 router.use("/message", requiredSignIn, checkExpiry, messageRoute);
 router.use("/plan", requiredSignIn, planRoute);
 router.use("/setting", settingRoute);
+router.use("/subscription", requiredSignIn, subscriptionRoute);
 
 export default router;
