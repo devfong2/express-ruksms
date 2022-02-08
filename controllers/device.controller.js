@@ -6,7 +6,8 @@ const allDevice = async (req, res, next) => {
     // console.log(req.user);
     let devices;
     if (req.user.isAdmin === 1) {
-      devices = await DeviceModel.find();
+      const { id } = req.query;
+      devices = await DeviceModel.find({ user: id });
     } else {
       devices = await DeviceModel.find({ user: req.user._id });
     }

@@ -46,7 +46,7 @@ const allUssd = async (req, res, next) => {
     let ussds = [];
     let totalItems = 0;
     const { id, page } = req.query;
-    console.log(page);
+    // console.log(page);
     if (req.user.isAdmin === 1) {
       if (id === "all") {
         ussds = await UssdModel.find()
@@ -83,15 +83,29 @@ const allUssd = async (req, res, next) => {
 
 const deleteUssd = async (req, res, next) => {
   try {
-    const { selectedUssd } = req.body;
-    await UssdModel.deleteMany({
-      _id: { $in: selectedUssd },
-      userID: req.user._id,
-    });
-
-    const ussds = await UssdModel.find({ userID: req.user._id })
-      .populate("deviceID")
-      .populate("userID");
+    const { selectedUssd, page } = req.body;
+    if (req.user.isAdmin === 1) {
+      await UssdModel.deleteMany({
+        _id: { $in: selectedUssd },
+      });
+    } else {
+      await UssdModel.deleteMany({
+        _id: { $in: selectedUssd },
+        userID: req.user._id,
+      });
+    }
+    let ussds = [];
+    if (page) {
+      ussds = await UssdModel.find({ userID: req.user._id })
+        .populate("deviceID")
+        .populate("userID")
+        .limit(15)
+        .skip(page * 15);
+    } else {
+      ussds = await UssdModel.find({ userID: req.user._id })
+        .populate("deviceID")
+        .populate("userID");
+    }
 
     res.json({
       success: true,
