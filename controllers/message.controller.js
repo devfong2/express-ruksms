@@ -53,7 +53,7 @@ const sendMessage = async (req, res, next) => {
     let messageFooter = "";
     if (
       user.contactsLimit !== null &&
-      user.contactsLimit <= 200 &&
+      user.contactsLimit <= newUser.value.contacts &&
       newUser.value.messageFooter.enable === 1
     ) {
       messageFooter = "\n" + newUser.value.messageFooter.message;
@@ -175,18 +175,10 @@ const deleteMessage = async (req, res, next) => {
   try {
     const { idForDelete } = req.body;
     await MessageModel.deleteMany({ _id: { $in: idForDelete } });
-    let messages;
-    if (req.user.isAdmin === 1) {
-      messages = await MessageModel.find().sort({ sentDate: -1 });
-    } else {
-      messages = await MessageModel.find({ user: req.user._id }).sort({
-        sentDate: -1,
-      });
-    }
 
     res.json({
       success: true,
-      data: messages,
+      data: null,
       error: null,
     });
   } catch (e) {
@@ -216,4 +208,39 @@ const allMessage = async (req, res, next) => {
   }
 };
 
-export default { sendMessage, allMessage, deleteMessage };
+const searchMessage = async (req, res, next) => {
+  try {
+    const { user, startDate, endDate } = req.body;
+    let messages;
+    if (req.user.isAdmin === 1) {
+      messages = await MessageModel.find({
+        user,
+        deliveredDate: {
+          $gte: new Date(startDate),
+          $lt: new Date(endDate),
+        },
+      }).sort({
+        sentDate: -1,
+      });
+    } else {
+      messages = await MessageModel.find({
+        user: req.user._id,
+        deliveredDate: {
+          $gte: new Date(startDate),
+          $lt: new Date(endDate),
+        },
+      }).sort({
+        sentDate: -1,
+      });
+    }
+    res.json({
+      success: true,
+      data: messages,
+      error: null,
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
+export default { sendMessage, allMessage, deleteMessage, searchMessage };

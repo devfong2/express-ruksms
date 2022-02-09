@@ -40,7 +40,9 @@ const createSubscription = async (req, res, next) => {
     }
     user.contactsLimit = plan.contacts;
     user.devicesLimit = plan.devices;
+    user.sortPhone = plan.sortPhone;
     user.expiryDate = new Date().setDate(new Date().getDate() + day);
+    user.subscription = subscription._id;
     await user.save();
 
     res.status(201).json({
