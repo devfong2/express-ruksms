@@ -10,6 +10,7 @@ export default async (req, res, next) => {
       err.statusCode = 200;
       throw err;
     }
+    console.log("report-status", req.body);
     const messages = JSON.parse(req.body.messages);
     // console.log(JSON.parse(req.body.messages));
     for (let i = 0; i < messages.length; i++) {
@@ -27,12 +28,8 @@ export default async (req, res, next) => {
         const user = await UserModel.findById(oneMessage.user);
         const plusCredit = Math.ceil(oneMessage.message.length / 70);
         if (user.credits !== null) {
-          const totalCredits = user.credits + plusCredit;
-          // console.log(user.credits);
-          // console.log(totalCredits);
-          await UserModel.findByIdAndUpdate(oneMessage.user, {
-            credits: totalCredits,
-          });
+          user.credits += plusCredit;
+          await user.save();
         }
       }
 

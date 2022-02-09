@@ -1,4 +1,6 @@
 import UssdModel from "../../models/ussd.model.js";
+import DeviceModel from "../../models/device.model.js";
+import UserModel from "../../models/user.model.js";
 import updateDashboard from "../../utilities/update-dashboard.js";
 
 export default async (req, res, next) => {
@@ -10,8 +12,10 @@ export default async (req, res, next) => {
       err.statusCode = 200;
       throw err;
     }
+    const user = await UserModel.findOne({ ID: userId });
+    const device = await DeviceModel.findOne({ androidId });
     const ussd = await UssdModel.findOneAndUpdate(
-      { ID: req.body.ussdId },
+      { ID: req.body.ussdId, deviceID: device._id, userID: user._id },
       {
         response: req.body.response,
         responseDate: new Date().toISOString(),

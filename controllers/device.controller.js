@@ -1,5 +1,6 @@
 import DeviceModel from "../models/device.model.js";
 import MessageModel from "../models/message.model.js";
+import UssdModel from "../models/ussd.model.js";
 
 const allDevice = async (req, res, next) => {
   try {
@@ -32,6 +33,7 @@ const deleteDevice = async (req, res, next) => {
     for (let i = 0; i < selectedDevice.length; i++) {
       const device = await DeviceModel.findOne({ ID: selectedDevice[i] });
       await MessageModel.deleteMany({ device: device._id });
+      await UssdModel.deleteMany({ deviceID: device._id });
     }
     const devices = await DeviceModel.find();
     res.json({
@@ -65,9 +67,10 @@ const findDeviceById = async (req, res, next) => {
 
 const updateDeviceById = async (req, res, next) => {
   try {
-    const device = await DeviceModel.findOneAndUpdate(
-      { user: req.user._id, _id: req.params.id },
-      { maxUssd: req.body.maxUssd }
+    const device = await DeviceModel.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
     );
     if (!device) {
       throw new Error("Device not found");

@@ -1,4 +1,6 @@
 import DeviceModel from "../../models/device.model.js";
+// import UssdModel from "../../models/ussd.model.js";
+// import MessageModel from "../../models/message.model.js";
 export default async (req, res, next) => {
   try {
     // console.log(2);
@@ -11,18 +13,18 @@ export default async (req, res, next) => {
 
     const device = await DeviceModel.findOne({ androidId });
     if (device.token !== token) {
-      await DeviceModel.findOneAndUpdate({ androidId }, { maxUssd: 0 });
-    }
+      // await UssdModel.deleteMany({ deviceID: device._id });
+      // await MessageModel.deleteMany({ device: device._id });
 
-    const findDeviceByAndroidId = await DeviceModel.findOneAndUpdate(
-      { androidId },
-      { token },
-      { new: true }
-    ).populate("user");
+      device.maxUssd = 0;
+    }
+    device.token = token;
+    await device.save();
+    await device.populate("user");
 
     res.json({
       success: true,
-      data: findDeviceByAndroidId,
+      data: device,
       error: null,
     });
   } catch (e) {

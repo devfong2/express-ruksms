@@ -78,6 +78,14 @@ const userSchema = new mongoose.Schema(
       required: true,
       default: "english",
     },
+    subscription: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "subscription",
+    },
+    sortPhone: {
+      type: Number,
+      default: 0,
+    },
   },
   { toJSON: { virtuals: true } }
 );
