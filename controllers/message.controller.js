@@ -73,6 +73,7 @@ const sendMessage = async (req, res, next) => {
         device: senders[indexDevice].device,
         simSlot: senders[indexDevice].simSlot,
         status: schedule ? "Scheduled" : "Pending",
+        schedule: schedule ? schedule : null,
       };
       manyMessage.push(obj);
       maxMessageIdValue++;

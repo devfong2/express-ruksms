@@ -66,6 +66,7 @@ export default async (req, res, next) => {
       type: "signIn",
       androidId: req.body.androidId,
     });
+
     res.json({
       success: true,
       data: {
