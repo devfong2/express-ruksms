@@ -13,7 +13,7 @@ servicesRouter.post("/receive-message.php", servicesController.receiveMessage);
 servicesRouter.get("/update.php", (req, res) =>
   res.json({
     versionCode: 30,
-    url: "https://rbsoft.org/downloads/sms-gateway/sms-gateway.apk",
+    url: "https://ruksms.com",
   })
 );
 

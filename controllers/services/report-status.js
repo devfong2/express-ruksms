@@ -10,7 +10,7 @@ export default async (req, res, next) => {
       err.statusCode = 200;
       throw err;
     }
-    console.log("report-status", req.body);
+    // console.log("report-status", req.body);
     const messages = JSON.parse(req.body.messages);
     // console.log(JSON.parse(req.body.messages));
     for (let i = 0; i < messages.length; i++) {

@@ -10,6 +10,10 @@ import connectDatabase from "./database/index.js";
 import errorHandler from "./middlewares/errorHandler.js";
 import routes from "./routes/index.js";
 
+import checkScheduleAndSetTimeOut from "./utilities/checkScheduleAndSetTimeOut.js";
+import autoSendUssd from "./utilities/auto-send-ussd.js";
+import autoSendMessage from "./utilities/autoSendMessage.js";
+
 const app = express();
 
 connectDatabase();
@@ -52,6 +56,9 @@ io.on("connection", function (socket) {
 
 app.use(routes);
 app.use(errorHandler);
+autoSendUssd(io);
+checkScheduleAndSetTimeOut(io);
+autoSendMessage(io);
 
 httpServer.listen(config.PORT, () =>
   console.log("server is listenning on port " + config.PORT)

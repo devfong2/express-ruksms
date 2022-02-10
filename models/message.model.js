@@ -15,7 +15,7 @@ const messageSchema = new mongoose.Schema({
     required: true,
   },
   schedule: {
-    type: Number,
+    type: Date,
     default: null,
   },
   sentDate: {
