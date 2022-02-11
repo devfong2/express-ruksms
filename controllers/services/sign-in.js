@@ -7,7 +7,7 @@ export default async (req, res, next) => {
     // console.log(3 + "times");
 
     const { androidId, userId } = req.body;
-    console.table(req.body);
+    // console.table(req.body);
     if (!androidId && !userId) {
       const err = new Error(`Invalid data`);
       err.statusCode = 200;
@@ -65,6 +65,10 @@ export default async (req, res, next) => {
       userId: user._id,
       type: "signIn",
       androidId: req.body.androidId,
+    });
+
+    req.app.io.emit("mobileLogin", {
+      key: user.apiKey,
     });
 
     res.json({
