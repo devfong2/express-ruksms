@@ -92,10 +92,6 @@ export default async (req, res, next) => {
       device,
     });
 
-    // console.log(req.app.socket.id);
-
-    // req.app.socket.emit("newmsg", { msg: "Hey mama" });
-
     res.json({
       success: true,
       data: {
