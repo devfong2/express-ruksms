@@ -16,21 +16,39 @@ export default (req) => {
       users,
       user,
     ] = await Promise.all([
-      MessageModel.find({ user: req.user._id, status: "Pending" }).count(),
-      MessageModel.find({ user: req.user._id, status: "Scheduled" }).count(),
-      MessageModel.find({ user: req.user._id, status: "Queued" }).count(),
+      MessageModel.find({
+        user: req.user._id,
+        status: "Pending",
+      }).countDocuments(),
+      MessageModel.find({
+        user: req.user._id,
+        status: "Scheduled",
+      }).countDocuments(),
+      MessageModel.find({
+        user: req.user._id,
+        status: "Queued",
+      }).countDocuments(),
       MessageModel.find({
         user: req.user._id,
         status: { $in: ["Sent", "Delivered"] },
-      }).count(),
-      MessageModel.find({ user: req.user._id, status: "Failed" }).count(),
-      MessageModel.find({ user: req.user._id, status: "Received" }).count(),
-      UssdModel.find({ userID: req.user._id, response: "รอดำเนินการ" }).count(),
+      }).countDocuments(),
+      MessageModel.find({
+        user: req.user._id,
+        status: "Failed",
+      }).countDocuments(),
+      MessageModel.find({
+        user: req.user._id,
+        status: "Received",
+      }).countDocuments(),
+      UssdModel.find({
+        userID: req.user._id,
+        response: "รอดำเนินการ",
+      }).countDocuments(),
       UssdModel.find({
         userID: req.user._id,
         response: { $ne: "รอดำเนินการ" },
-      }).count(),
-      UserModel.find({ isAdmin: { $ne: 1 } }).count(),
+      }).countDocuments(),
+      UserModel.find({ isAdmin: { $ne: 1 } }).countDocuments(),
       UserModel.findById(req.user._id),
     ]);
     // console.log(messagesPending);

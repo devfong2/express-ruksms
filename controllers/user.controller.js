@@ -254,6 +254,7 @@ const register = async (req, res, next) => {
       credits: newUser.value.credits,
       contactsLimit: newUser.value.contacts,
       devicesLimit: newUser.value.devices,
+      sortPhone: newUser.value.sortPhone,
       expiryDate: new Date().setDate(
         new Date().getDate() + newUser.value.expiryAfter
       ),
