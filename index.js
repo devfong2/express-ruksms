@@ -2,7 +2,6 @@ import express from "express";
 import passport from "passport";
 import path from "path";
 import helmet from "helmet";
-// import rateLimit from "express-rate-limit";
 import { Server } from "socket.io";
 import { createServer } from "http";
 import config from "./config/index.js";
@@ -21,16 +20,6 @@ connectDatabase();
 let rootPath = path.resolve();
 rootPath = path.join(rootPath, "public");
 
-// app.use(cors());
-// app.set("trust proxy", 1);
-
-// const limiter = rateLimit({
-//   windowMs: 1 * 60 * 1000, // 1 minutes
-//   max: 5000, // limit each IP to 5000 requests per windowMs
-// });
-
-// app.use(limiter);
-
 //ความปลอดภัยของ server
 app.use(helmet());
 app.use(express.json({ limit: "50MB" }));
@@ -42,12 +31,8 @@ const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
     origin: config.IO_CORS,
-    // methods: ["GET", "POST"]
   },
 });
-
-// eslint-disable-next-line no-undef
-// console.log(process.env.NODE_ENV);
 
 app.io = io;
 io.on("connection", function (socket) {
