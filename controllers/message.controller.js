@@ -192,11 +192,19 @@ const allMessage = async (req, res, next) => {
     let messages;
     if (req.user.isAdmin === 1) {
       const { id } = req.query;
-      messages = await MessageModel.find({ user: id }).sort({ sentDate: -1 });
+      messages = await MessageModel.find({ user: id })
+        .sort({ sentDate: -1 })
+        .select(
+          "ID number message schedule sentDate deliveredDate status simSlot -_id"
+        );
     } else {
-      messages = await MessageModel.find({ user: req.user._id }).sort({
-        sentDate: -1,
-      });
+      messages = await MessageModel.find({ user: req.user._id })
+        .sort({
+          sentDate: -1,
+        })
+        .select(
+          "ID number message schedule sentDate deliveredDate status simSlot -_id"
+        );
     }
 
     res.json({
@@ -211,32 +219,72 @@ const allMessage = async (req, res, next) => {
 
 const searchMessage = async (req, res, next) => {
   try {
-    const { user, startDate, endDate } = req.body;
+    const {
+      user,
+      startDate,
+      endDate,
+      device,
+      status,
+      mobileNumber,
+      message,
+      page,
+    } = req.body;
+    let query = {
+      deliveredDate: {
+        $gte: new Date(startDate),
+        $lt: new Date(endDate),
+      },
+    };
+    if (mobileNumber !== "") {
+      query.number = new RegExp(mobileNumber);
+    }
+
+    if (message !== "") {
+      query.message = new RegExp(message);
+    }
+
+    if (status !== "All") {
+      query.status = status;
+    }
+
+    if (device !== "All") {
+      query.device = device;
+    }
+
     let messages;
+    let count = 0;
     if (req.user.isAdmin === 1) {
       messages = await MessageModel.find({
         user,
-        deliveredDate: {
-          $gte: new Date(startDate),
-          $lt: new Date(endDate),
-        },
-      }).sort({
-        sentDate: -1,
-      });
+        ...query,
+      })
+        .sort({
+          sentDate: -1,
+        })
+        .limit(50)
+        .skip(page * 50);
+      count = await MessageModel.find({
+        user,
+        ...query,
+      }).countDocuments();
     } else {
       messages = await MessageModel.find({
         user: req.user._id,
-        deliveredDate: {
-          $gte: new Date(startDate),
-          $lt: new Date(endDate),
-        },
-      }).sort({
-        sentDate: -1,
-      });
+        ...query,
+      })
+        .sort({
+          sentDate: -1,
+        })
+        .limit(50)
+        .skip(page * 50);
+      count = await MessageModel.find({
+        user: req.user._id,
+        ...query,
+      }).countDocuments();
     }
     res.json({
       success: true,
-      data: messages,
+      data: { messages, count },
       error: null,
     });
   } catch (e) {

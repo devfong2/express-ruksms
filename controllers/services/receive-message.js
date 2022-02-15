@@ -32,8 +32,8 @@ export default async (req, res, next) => {
           device: device._id,
           simSlot: messages2[i].simSlot,
           status: "Received",
-          sentDate: new Date(messages2[i].sentDate.split(" ")[0]),
-          deliveredDate: new Date(messages2[i].receivedDate.split(" ")[0]),
+          sentDate: new Date(),
+          deliveredDate: new Date(),
         });
         maxMessageIdValue++;
         req.user = { _id: user._id };
