@@ -2,6 +2,7 @@ import Jwt from "jsonwebtoken";
 import UserModel from "../../models/user.model.js";
 import DeviceModel from "../../models/device.model.js";
 import config from "../../config/index.js";
+import activity from "../../utilities/activity.js";
 export default async (req, res, next) => {
   try {
     // console.log(3 + "times");
@@ -66,10 +67,14 @@ export default async (req, res, next) => {
       type: "signIn",
       androidId: req.body.androidId,
     });
+    await activity(
+      user._id,
+      `อุปกรณ์ ${device.name || device.model} เข้าสู่ระบบ`
+    );
 
-    req.app.io.emit("mobileLogin", {
-      key: user.apiKey,
-    });
+    // req.app.io.emit("mobileLogin", {
+    //   key: user.apiKey,
+    // });
 
     res.json({
       success: true,

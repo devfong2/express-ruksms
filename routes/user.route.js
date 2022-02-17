@@ -1,11 +1,12 @@
 import { Router } from "express";
-import userController from "../controllers/user.controller.js";
+import userController from "../controllers/users/index.js";
 import requiredSignIn from "../middlewares/authenticate.js";
+import requiredAdmin from "../middlewares/requiredAdmin.js";
 import checkValidate, { signInValidation } from "../middlewares/validator.js";
 
 const userRoute = Router();
 
-userRoute.post("/", requiredSignIn, userController.createUser);
+userRoute.post("/", requiredSignIn, requiredAdmin, userController.createUser);
 userRoute.get("/", requiredSignIn, userController.allUser);
 userRoute.get("/me", requiredSignIn, userController.me);
 userRoute.post(
@@ -20,7 +21,12 @@ userRoute.put(
   requiredSignIn,
   userController.updatePassword
 );
-userRoute.post("/delete", requiredSignIn, userController.deleteUser);
+userRoute.post(
+  "/delete",
+  requiredSignIn,
+  requiredAdmin,
+  userController.deleteUser
+);
 userRoute.post("/register", userController.register);
 userRoute.post("/reset-password", userController.resetPassword);
 userRoute.post("/verify-token", userController.verifyToken);

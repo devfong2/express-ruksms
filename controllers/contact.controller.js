@@ -1,5 +1,6 @@
 import ContactModel from "./../models/contact.model.js";
 import ContactListModel from "../models/contactList.model.js";
+import activity from "../utilities/activity.js";
 // import UserModel from "../models/user.model.js";
 const allContact = async (req, res, next) => {
   try {
@@ -56,6 +57,10 @@ const createContact = async (req, res, next) => {
       throw new Error("The list exceeds the limit.Please upgrade your account");
     }
     const result = await ContactModel.insertMany(contacts);
+    await activity(
+      req.user._id,
+      `เพิ่มรายชื่อผู้ติดต่อ ${result.length} รายชื่อ`
+    );
 
     res.json({
       success: true,
@@ -73,6 +78,7 @@ const updateContact = async (req, res, next) => {
       { _id: { $in: req.body.contactID } },
       req.body.contactUpdate
     );
+    await activity(req.user._id, `แก้ไขรายชื่อผู้ติดต่อ`);
     res.json({
       success: true,
       data: result,
@@ -88,6 +94,7 @@ const deleteContact = async (req, res, next) => {
     const result = await ContactModel.deleteMany({
       _id: { $in: req.body.contactID },
     });
+    await activity(req.user._id, `ลบรายชื่อผู้ติดต่อ`);
     res.json({
       success: true,
       data: result,

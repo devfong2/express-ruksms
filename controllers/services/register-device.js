@@ -3,6 +3,7 @@ import DeviceModel from "../../models/device.model.js";
 import createID from "../../utilities/create-id.js";
 import config from "../../config/index.js";
 import { comparePassword } from "../../utilities/password.js";
+import activity from "../../utilities/activity.js";
 export default async (req, res, next) => {
   try {
     // console.log(1);
@@ -84,6 +85,10 @@ export default async (req, res, next) => {
       });
       await device.save();
       await device.populate("user");
+      await activity(
+        user._id,
+        `เพิ่มอุปกรณ์ ${device.name || device.model} เข้ามาในระบบ`
+      );
     }
 
     req.app.io.emit("updateDevice", {

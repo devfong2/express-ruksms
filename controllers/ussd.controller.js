@@ -3,6 +3,7 @@ import processUssdRequest from "../utilities/send-ussd.js";
 import UssdModel from "../models/ussd.model.js";
 import DeviceModel from "../models/device.model.js";
 import checkDeviceBeforeSend from "../utilities/check-device-before-send.js";
+import activity from "../utilities/activity.js";
 // import SettingModel from "../models/setting.model.js";
 
 const sendUssdRequest = async (req, res, next) => {
@@ -30,6 +31,7 @@ const sendUssdRequest = async (req, res, next) => {
     await ussd.populate("deviceID");
     await ussd.populate("userID");
     // changeUssdStatus(ussd, req);
+    await activity(req.user._id, "ส่งรหัส USSD");
     res.json({
       success: true,
       data: ussd,
@@ -106,7 +108,7 @@ const deleteUssd = async (req, res, next) => {
         .populate("deviceID")
         .populate("userID");
     }
-
+    await activity(req.user._id, "ลบข้อมูลการส่งรหัส USSD");
     res.json({
       success: true,
       data: ussds,
@@ -126,7 +128,7 @@ const sendUssdManyRequest = async (req, res, next) => {
 
     const result = await UssdModel.insertMany(manyUssd);
     // console.log(result);
-
+    await activity(req.user._id, "ส่งรหัส USSD หลายรายการ");
     res.json({
       success: true,
       data: result,
