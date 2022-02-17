@@ -5,11 +5,15 @@ import generateApiKey from "../../utilities/generate-api-key.js";
 import activity from "../../utilities/activity.js";
 export default async (req, res, next) => {
   try {
-    const { name, password, email } = req.body;
+    const { name, password, email, phone } = req.body;
     const allUser = await UserModel.find();
     const findUser = allUser.find((a) => a.email === email);
+    const findPhone = allUser.find((a) => a.phone === phone);
     if (findUser) {
       throw new Error("Email already exist");
+    }
+    if (findPhone) {
+      throw new Error("phone already exist");
     }
     const ID = await createID(allUser);
     const obj = {
@@ -19,6 +23,7 @@ export default async (req, res, next) => {
       email,
       apiKey: await generateApiKey(40),
       dateAdded: new Date(),
+      phone,
     };
 
     const user = new UserModel(obj);

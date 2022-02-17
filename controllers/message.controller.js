@@ -231,7 +231,7 @@ const searchMessage = async (req, res, next) => {
       page,
     } = req.body;
     let query = {
-      deliveredDate: {
+      sentDate: {
         $gte: new Date(startDate),
         $lt: new Date(endDate),
       },
@@ -251,7 +251,7 @@ const searchMessage = async (req, res, next) => {
     if (device !== "All") {
       query.device = device;
     }
-
+    console.log(query);
     let messages;
     let count = 0;
     if (req.user.isAdmin === 1) {

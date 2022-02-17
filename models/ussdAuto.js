@@ -4,9 +4,15 @@ const ussdAutoSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "device",
+    required: true,
+  },
   device: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "device",
+    required: true,
   },
   simSlot: {
     type: Number,
@@ -15,9 +21,11 @@ const ussdAutoSchema = new mongoose.Schema({
   schedule: Date,
   times: {
     type: Number,
-    default: 0,
+    default: 1,
   },
   timer: Number,
+  date: Date,
+  status: String,
 });
 
 export default mongoose.model("ussd-auto", ussdAutoSchema);
