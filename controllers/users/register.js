@@ -14,8 +14,16 @@ export default async (req, res, next) => {
     const { name, password, email, phone, knownFrom } = req.body;
     const allUser = await UserModel.find();
     const findUser = allUser.find((a) => a.email === email);
+    const findPhone = allUser.find((a) => a.phone === phone);
+    const findName = allUser.find((a) => a.name === name);
     if (findUser) {
       throw new Error("Email already exist");
+    }
+    if (findPhone) {
+      throw new Error("Phone already exist");
+    }
+    if (findName) {
+      throw new Error("Name already exist");
     }
     const newUser = await SettingModel.findOne({ name: "newUser" });
 

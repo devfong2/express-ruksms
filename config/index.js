@@ -6,7 +6,7 @@ export default {
     URI:
       nodeEnv === "production"
         ? "mongodb://node25890-express-ruksms.th.app.ruk-com.cloud:27017/ruksms"
-        : "mongodb://localhost:27017/ruksms",
+        : "mongodb://node25890-express-ruksms.th.app.ruk-com.cloud:11185/ruksms",
     PASSWORD: "MLHiho08137",
     USERNAME: "admin",
   },
