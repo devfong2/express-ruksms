@@ -2,7 +2,7 @@ import SettingModel from "../models/setting.model.js";
 import config from "../config/index.js";
 import uploadImage, { checkBase64Format } from "../utilities/upload-image.js";
 import updateDashboard from "../utilities/update-dashboard.js";
-
+import activity from "../utilities/activity.js";
 const allSetting = async (req, res, next) => {
   try {
     const settings = await SettingModel.find();
@@ -24,6 +24,7 @@ const updateSetting = async (req, res, next) => {
       { value },
       { new: true }
     );
+    await activity(req.user._id, `แก้ไขการตั้งค่า ${name}`);
     res.json({
       success: true,
       data: setting,
@@ -61,7 +62,7 @@ const updateSettingWebSite = async (req, res, next) => {
       },
       { new: true }
     );
-
+    await activity(req.user._id, `แก้ไขการตั้งค่า ${website.name}`);
     res.json({
       success: true,
       data: newWebsite,

@@ -7,7 +7,7 @@ import MessageModel from "./../models/message.model.js";
 import SettingModel from "./../models/setting.model.js";
 import UserModel from "../models/user.model.js";
 import updateDashboard from "../utilities/update-dashboard.js";
-
+import activity from "../utilities/activity.js";
 const sendMessage = async (req, res, next) => {
   try {
     const { user } = req;
@@ -110,6 +110,7 @@ const sendMessage = async (req, res, next) => {
       }
     }
     await updateDashboard(req);
+    await activity(req.user._id, `ส่งข้อความ ${result.length} ข้อความ`);
 
     res.json({
       success: true,
@@ -176,7 +177,7 @@ const deleteMessage = async (req, res, next) => {
   try {
     const { idForDelete } = req.body;
     await MessageModel.deleteMany({ _id: { $in: idForDelete } });
-
+    await activity(req.user._id, `ลบข้อความ ${idForDelete.length} ข้อความ`);
     res.json({
       success: true,
       data: null,

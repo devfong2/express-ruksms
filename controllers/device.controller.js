@@ -1,7 +1,7 @@
 import DeviceModel from "../models/device.model.js";
 import MessageModel from "../models/message.model.js";
 import UssdModel from "../models/ussd.model.js";
-
+import activity from "../utilities/activity.js";
 const allDevice = async (req, res, next) => {
   try {
     // console.log(req.user);
@@ -36,6 +36,7 @@ const deleteDevice = async (req, res, next) => {
       await UssdModel.deleteMany({ deviceID: device._id });
     }
     const devices = await DeviceModel.find();
+    await activity(req.user._id, "ลบอุปกรณ์");
     res.json({
       success: true,
       data: devices,
@@ -75,6 +76,7 @@ const updateDeviceById = async (req, res, next) => {
     if (!device) {
       throw new Error("Device not found");
     }
+    await activity(req.user._id, "แก้ไขอุปกรณ์");
     res.json({
       success: true,
       data: device,

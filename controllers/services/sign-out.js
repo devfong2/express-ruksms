@@ -1,4 +1,5 @@
 import DeviceModel from "../../models/device.model.js";
+import activity from "../../utilities/activity.js";
 export default async (req, res) => {
   // console.log(req.body);
   const { androidId, userId } = req.body;
@@ -19,6 +20,10 @@ export default async (req, res) => {
       type: "signOut",
       androidId: req.body.androidId,
     });
+    await activity(
+      device.user,
+      `อุปกรณ์ ${device.name || device.model} ออกจากระบบ`
+    );
   }
   res.json({
     success: true,

@@ -1,7 +1,11 @@
+import fs from "fs";
+import path from "path";
+import handlebars from "handlebars";
+import sendMail from "../utilities/send-mail.js";
 import SubscriptionModel from "../models/subscription.model.js";
 import PlanModel from "../models/plan.model.js";
 import UserModel from "../models/user.model.js";
-
+import activity from "../utilities/activity.js";
 const createSubscription = async (req, res, next) => {
   try {
     const { planID, userID } = req.body;
@@ -45,6 +49,33 @@ const createSubscription = async (req, res, next) => {
     user.subscription = subscription._id;
     await user.save();
 
+    const html = fs.readFileSync(
+      path.join(path.resolve(), "email/userLimitsUpdate.html"),
+      {
+        encoding: "utf-8",
+      }
+    );
+    const template = handlebars.compile(html);
+    const replacements = {
+      user: user.name,
+      credits: user.credits,
+      devices: user.devicesLimit,
+      contacts: user.contactsLimit,
+      expiryDate: new Date(user.expiryDate).toLocaleString("default", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }),
+    };
+    const htmlToSend = template(replacements);
+    // console.log(html);
+
+    await sendMail("Upgrade account success 💰", user.email, htmlToSend);
+    await activity(
+      req.user._id,
+      `เพิ่มแพ็กเกจ ${plan.name} ให้ผู้ใช้ ${user.email}[${user.name}]`
+    );
     res.status(201).json({
       success: true,
       data: subscription,

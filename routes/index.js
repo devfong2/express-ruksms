@@ -23,7 +23,7 @@ router.use("/template", requiredSignIn, checkExpiry, templateRoute);
 router.use("/contact-list", requiredSignIn, checkExpiry, contactListRoute);
 router.use("/contact", requiredSignIn, checkExpiry, contactRoute);
 router.use("/message", requiredSignIn, checkExpiry, messageRoute);
-router.use("/plan", requiredSignIn, planRoute);
+router.use("/plan", planRoute);
 router.use("/setting", settingRoute);
 router.use("/subscription", requiredSignIn, subscriptionRoute);
 

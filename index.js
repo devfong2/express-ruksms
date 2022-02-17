@@ -8,14 +8,15 @@ import config from "./config/index.js";
 import connectDatabase from "./database/index.js";
 import errorHandler from "./middlewares/errorHandler.js";
 import routes from "./routes/index.js";
-
 import checkScheduleAndSetTimeOut from "./utilities/checkScheduleAndSetTimeOut.js";
 import autoSendUssd from "./utilities/auto-send-ussd.js";
 import autoSendMessage from "./utilities/autoSendMessage.js";
+import initialDatabase from "./utilities/initial-database/index.js";
 
 const app = express();
 
 connectDatabase();
+initialDatabase();
 
 let rootPath = path.resolve();
 rootPath = path.join(rootPath, "public");
