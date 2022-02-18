@@ -1,4 +1,5 @@
 import UssdAutoModel from "../../models/ussdAuto.js";
+import activity from "../../utilities/activity.js";
 export default async (req, res, next) => {
   try {
     const { idForDelete, page } = req.body;
@@ -35,6 +36,10 @@ export default async (req, res, next) => {
     const totalItems = await UssdAutoModel.find({
       user: req.user._id,
     }).countDocuments();
+    await activity(
+      req.user._id,
+      "ลบรายการส่งข้อความอัตโนมัติ " + idForDelete.length + " รายการ"
+    );
     res.json({
       success: true,
       data: { ussdAuto, newPage, totalItems },

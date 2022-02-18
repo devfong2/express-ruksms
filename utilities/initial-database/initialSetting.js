@@ -11,7 +11,7 @@ export default () => {
           value: {
             port: 587,
             host: "smtp.gmail.com",
-            user: "admin@ruksms.com",
+            user: "support@ruksms.com",
             pass: "@@aa12345",
             from: "RUKSMS 🙏",
           },

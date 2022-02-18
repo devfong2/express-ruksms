@@ -87,7 +87,6 @@ const userSchema = new mongoose.Schema(
       default: null,
     },
     phone: String,
-    knownFrom: String,
   },
   { toJSON: { virtuals: true } }
 );
@@ -97,6 +96,11 @@ userSchema.options.toJSON.transform = function (doc, obj) {
   delete obj._id;
   delete obj.__v;
 };
+userSchema.virtual("userDetail", {
+  ref: "user-detail",
+  localField: "_id",
+  foreignField: "user",
+});
 
 const UserModel = mongoose.model("user", userSchema);
 

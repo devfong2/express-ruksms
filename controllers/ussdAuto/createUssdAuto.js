@@ -3,6 +3,7 @@ import UssdAutoModel from "../../models/ussdAuto.js";
 import DeviceModel from "../../models/device.model.js";
 import UssdModel from "../../models/ussd.model.js";
 import processUssdRequest from "../../utilities/send-ussd.js";
+import activity from "../../utilities/activity.js";
 
 export default async (req, res, next) => {
   try {
@@ -33,6 +34,10 @@ export default async (req, res, next) => {
       }
     }
     await result.populate("device", "name model sims");
+    await activity(
+      req.user._id,
+      "สร้างรายการส่งข้อความอัตโนมัติ " + result.request
+    );
     res.status(201).json({
       success: true,
       data: result,

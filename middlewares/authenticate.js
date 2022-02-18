@@ -14,12 +14,14 @@ passport.use(
   // decode jwt auto
   new JwtStrategy(opts, async (jwtPayload, done) => {
     try {
-      const oneUser = await UserModel.findById(jwtPayload.id).populate({
-        path: "subscription",
-        populate: {
-          path: "planID",
-        },
-      });
+      const oneUser = await UserModel.findById(jwtPayload.id)
+        .populate({
+          path: "subscription",
+          populate: {
+            path: "planID",
+          },
+        })
+        .populate("userDetail");
       if (!oneUser) {
         return done(new Error("ไม่พบบัญชีผู้ใช้"), false);
       }
