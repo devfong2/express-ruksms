@@ -38,7 +38,11 @@ const createSubscription = async (req, res, next) => {
       expiryDate: new Date().setDate(new Date().getDate() + day),
     });
     if (user.credits !== null) {
-      user.credits += plan.credits;
+      if (plan.credits !== null) {
+        user.credits += plan.credits;
+      } else {
+        user.credits = plan.credits;
+      }
     } else {
       user.credits = plan.credits;
     }
