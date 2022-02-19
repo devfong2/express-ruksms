@@ -87,4 +87,22 @@ const updateDeviceById = async (req, res, next) => {
   }
 };
 
-export default { allDevice, deleteDevice, findDeviceById, updateDeviceById };
+const countMessageByDevice = async (req, res, next) => {
+  try {
+    res.json({
+      success: true,
+      data: await MessageModel.countDocuments({ device: req.body.device }),
+      error: null,
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
+export default {
+  allDevice,
+  deleteDevice,
+  findDeviceById,
+  updateDeviceById,
+  countMessageByDevice,
+};

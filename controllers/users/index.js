@@ -8,6 +8,8 @@ import deleteUser from "./deleteUser.js";
 import resetPassword from "./resetPassword.js";
 import verifyToken from "./verifyToken.js";
 import confirmResetPassword from "./confirmResetPassword.js";
+import getUserDetailByUserId from "./getUserDetailByUserId.js";
+import resetUserData from "./resetUserData.js";
 
 const me = (req, res, next) => {
   try {
@@ -32,4 +34,6 @@ export default {
   resetPassword,
   verifyToken,
   confirmResetPassword,
+  getUserDetailByUserId,
+  resetUserData,
 };

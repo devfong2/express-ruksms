@@ -44,6 +44,8 @@ const sendMessage = async (req, res, next) => {
     // หาไอดี
     const maxMessageId = await SettingModel.findOne({ name: "maxMessageId" });
     let maxMessageIdValue = maxMessageId.value;
+    maxMessageId.value = maxMessageIdValue + messages.length + 1;
+    await maxMessageId.save();
     // group id
     const groupID = await generateGroupID(50);
     const manyMessage = [];
@@ -74,6 +76,7 @@ const sendMessage = async (req, res, next) => {
         simSlot: senders[indexDevice].simSlot,
         status: schedule ? "Scheduled" : "Pending",
         schedule: schedule ? schedule : null,
+        sentDate: schedule ? schedule : new Date(),
       };
       manyMessage.push(obj);
       maxMessageIdValue++;
@@ -84,11 +87,9 @@ const sendMessage = async (req, res, next) => {
         indexDevice = 0;
       }
     });
-    await SettingModel.findByIdAndUpdate(maxMessageId._id, {
-      value: maxMessageIdValue,
-    });
-    // console.log(manyMessage);
+
     const result = await MessageModel.insertMany(manyMessage);
+
     if (schedule) {
       const minute = timeForSend.diff(present, "minutes");
       const second = minute * 60 * 1000;
@@ -190,16 +191,47 @@ const deleteMessage = async (req, res, next) => {
 
 const allMessage = async (req, res, next) => {
   try {
+    const { user, startDate, endDate, device, status, mobileNumber, message } =
+      req.body;
+    let query = {
+      sentDate: {
+        $gte: new Date(startDate),
+        $lt: new Date(endDate),
+      },
+    };
+    if (mobileNumber !== "") {
+      query.number = new RegExp(mobileNumber);
+    }
+
+    if (message !== "") {
+      query.message = new RegExp(message);
+    }
+
+    if (status !== "All") {
+      query.status = status;
+    }
+
+    if (device !== "All") {
+      query.device = device;
+    }
+    // console.log(query);
     let messages;
     if (req.user.isAdmin === 1) {
-      const { id } = req.query;
-      messages = await MessageModel.find({ user: id })
-        .sort({ sentDate: -1 })
+      messages = await MessageModel.find({
+        user,
+        ...query,
+      })
+        .sort({
+          sentDate: -1,
+        })
         .select(
           "ID number message schedule sentDate deliveredDate status simSlot -_id"
         );
     } else {
-      messages = await MessageModel.find({ user: req.user._id })
+      messages = await MessageModel.find({
+        user: req.user._id,
+        ...query,
+      })
         .sort({
           sentDate: -1,
         })
@@ -207,7 +239,6 @@ const allMessage = async (req, res, next) => {
           "ID number message schedule sentDate deliveredDate status simSlot -_id"
         );
     }
-
     res.json({
       success: true,
       data: messages,
@@ -251,7 +282,7 @@ const searchMessage = async (req, res, next) => {
     if (device !== "All") {
       query.device = device;
     }
-    console.log(query);
+    // console.log(query);
     let messages;
     let count = 0;
     if (req.user.isAdmin === 1) {

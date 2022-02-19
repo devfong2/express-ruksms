@@ -9,7 +9,7 @@ const userDetailSchema = new mongoose.Schema({
   knownFrom: String,
   verify: {
     type: Number,
-    default: 1,
+    default: 0,
   },
   verifyImg: String,
   verifyDetail: String,

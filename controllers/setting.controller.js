@@ -1,4 +1,5 @@
 import SettingModel from "../models/setting.model.js";
+import ActivityModel from "../models/activity.model.js";
 import config from "../config/index.js";
 import uploadImage, { checkBase64Format } from "../utilities/upload-image.js";
 import updateDashboard from "../utilities/update-dashboard.js";
@@ -104,10 +105,26 @@ const dashBoardData = async (req, res, next) => {
   }
 };
 
+const allActivity = async (req, res, next) => {
+  try {
+    const result = await ActivityModel.find()
+      .populate("user", "name email")
+      .sort({ date: -1 });
+    res.json({
+      success: true,
+      data: result,
+      error: null,
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
 export default {
   allSetting,
   updateSetting,
   updateSettingWebSite,
   websiteData,
   dashBoardData,
+  allActivity,
 };
