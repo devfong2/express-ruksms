@@ -9,6 +9,18 @@ const userRoute = Router();
 userRoute.post("/", requiredSignIn, requiredAdmin, userController.createUser);
 userRoute.get("/", requiredSignIn, userController.allUser);
 userRoute.get("/me", requiredSignIn, userController.me);
+userRoute.get(
+  "/detail",
+  requiredSignIn,
+  requiredAdmin,
+  userController.getUserDetailByUserId
+);
+userRoute.post(
+  "/reset",
+  requiredSignIn,
+  requiredAdmin,
+  userController.resetUserData
+);
 userRoute.post(
   "/sign-in",
   signInValidation,

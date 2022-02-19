@@ -20,6 +20,8 @@ export default async (req, res, next) => {
 
       const maxMessageId = await SettingModel.findOne({ name: "maxMessageId" });
       let maxMessageIdValue = maxMessageId.value;
+      maxMessageId.value = maxMessageIdValue + messages2.length + 1;
+      await maxMessageId.save();
 
       for (let i = 0; i < messages2.length; i++) {
         await MessageModel.create({
@@ -39,11 +41,6 @@ export default async (req, res, next) => {
         req.user = { _id: user._id };
         await updateDashboard(req);
       }
-
-      await SettingModel.findOneAndUpdate(
-        { name: "maxMessageId" },
-        { value: maxMessageIdValue }
-      );
     }
     // console.log("=========Receive-message===========");
     res.json({

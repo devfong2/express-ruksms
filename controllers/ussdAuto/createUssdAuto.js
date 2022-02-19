@@ -1,5 +1,5 @@
 import moment from "moment";
-import UssdAutoModel from "../../models/ussdAuto.js";
+import UssdAutoModel from "../../models/ussdAuto.model.js";
 import DeviceModel from "../../models/device.model.js";
 import UssdModel from "../../models/ussd.model.js";
 import processUssdRequest from "../../utilities/send-ussd.js";

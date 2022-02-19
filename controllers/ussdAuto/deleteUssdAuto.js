@@ -1,4 +1,4 @@
-import UssdAutoModel from "../../models/ussdAuto.js";
+import UssdAutoModel from "../../models/ussdAuto.model.js";
 import activity from "../../utilities/activity.js";
 export default async (req, res, next) => {
   try {
