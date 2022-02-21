@@ -31,7 +31,7 @@ const sendUssdRequest = async (req, res, next) => {
     await ussd.populate("deviceID");
     await ussd.populate("userID");
     // changeUssdStatus(ussd, req);
-    await activity(req.user._id, "ส่งรหัส USSD");
+    await activity(req, "ส่งรหัส USSD");
     res.json({
       success: true,
       data: ussd,
@@ -108,7 +108,7 @@ const deleteUssd = async (req, res, next) => {
         .populate("deviceID")
         .populate("userID");
     }
-    await activity(req.user._id, "ลบข้อมูลการส่งรหัส USSD");
+    await activity(req, "ลบข้อมูลการส่งรหัส USSD");
     res.json({
       success: true,
       data: ussds,
@@ -128,7 +128,7 @@ const sendUssdManyRequest = async (req, res, next) => {
 
     const result = await UssdModel.insertMany(manyUssd);
     // console.log(result);
-    await activity(req.user._id, "ส่งรหัส USSD หลายรายการ");
+    await activity(req, "ส่งรหัส USSD หลายรายการ");
     res.json({
       success: true,
       data: result,

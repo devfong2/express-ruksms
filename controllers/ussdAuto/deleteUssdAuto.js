@@ -37,7 +37,7 @@ export default async (req, res, next) => {
       user: req.user._id,
     }).countDocuments();
     await activity(
-      req.user._id,
+      req,
       "ลบรายการส่งข้อความอัตโนมัติ " + idForDelete.length + " รายการ"
     );
     res.json({

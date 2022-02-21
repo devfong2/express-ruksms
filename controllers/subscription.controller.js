@@ -77,7 +77,7 @@ const createSubscription = async (req, res, next) => {
 
     await sendMail("Upgrade account success 💰", user.email, htmlToSend);
     await activity(
-      req.user._id,
+      req,
       `เพิ่มแพ็กเกจ ${plan.name} ให้ผู้ใช้ ${user.email}[${user.name}]`
     );
     res.status(201).json({

@@ -6,4 +6,5 @@ deviceRoute.get("/:id", deviceController.findDeviceById);
 deviceRoute.put("/:id", deviceController.updateDeviceById);
 deviceRoute.post("/delete", deviceController.deleteDevice);
 deviceRoute.post("/message", deviceController.countMessageByDevice);
+deviceRoute.post("/motivate", deviceController.motivate);
 export default deviceRoute;

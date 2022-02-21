@@ -67,10 +67,8 @@ export default async (req, res, next) => {
       type: "signIn",
       androidId: req.body.androidId,
     });
-    await activity(
-      user._id,
-      `อุปกรณ์ ${device.name || device.model} เข้าสู่ระบบ`
-    );
+    req.user = { _id: user._id };
+    await activity(req, `อุปกรณ์ ${device.name || device.model} เข้าสู่ระบบ`);
 
     // req.app.io.emit("mobileLogin", {
     //   key: user.apiKey,

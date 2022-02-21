@@ -16,7 +16,7 @@ const allTemplate = async (req, res, next) => {
 const createTemplate = async (req, res, next) => {
   try {
     const template = await TemplateModel.create(req.body);
-    await activity(req.user._id, "สร้างแม่แบบการส่งข้อความ " + template.name);
+    await activity(req, "สร้างแม่แบบการส่งข้อความ " + template.name);
     res.json({
       success: true,
       data: template,
@@ -33,7 +33,7 @@ const deleteTemplate = async (req, res, next) => {
       _id: { $in: req.body.selectedID },
     });
     const templates = await TemplateModel.find({ userID: req.user._id });
-    await activity(req.user._id, "ลบแม่แบบการส่งข้อความ");
+    await activity(req, "ลบแม่แบบการส่งข้อความ");
     res.json({
       success: true,
       data: templates,

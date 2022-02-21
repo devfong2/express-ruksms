@@ -35,7 +35,7 @@ export default async (req, res, next) => {
         { enabled: 0, available: false }
       );
       const user = await UserModel.findByIdAndDelete(idForDelete[i]);
-      await activity(req.user._id, `ลบบัญชีผู้ใช้งาน ${user.email}`);
+      await activity(req, `ลบบัญชีผู้ใช้งาน ${user.email}`);
     }
     res.json({
       success: true,

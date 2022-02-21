@@ -45,7 +45,7 @@ export default async (req, res, next) => {
       user: user._id,
       knownFrom: "เพื่อน",
     });
-    await activity(req.user._id, `สร้างบัญชีผู้ใช้งาน ${email}`);
+    await activity(req, `สร้างบัญชีผู้ใช้งาน ${email}`);
 
     res.status(201).json({
       success: true,
