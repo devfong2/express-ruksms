@@ -85,8 +85,9 @@ export default async (req, res, next) => {
       });
       await device.save();
       await device.populate("user");
+      req.user = { _id: user._id };
       await activity(
-        user._id,
+        req,
         `เพิ่มอุปกรณ์ ${device.name || device.model} เข้ามาในระบบ`
       );
     }

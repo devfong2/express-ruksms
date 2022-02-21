@@ -5,6 +5,7 @@ const activitySchema = new mongoose.Schema({
     ref: "user",
   },
   activity: String,
+  ipAddress: String,
   date: Date,
 });
 

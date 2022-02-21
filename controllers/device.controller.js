@@ -2,13 +2,18 @@ import DeviceModel from "../models/device.model.js";
 import MessageModel from "../models/message.model.js";
 import UssdModel from "../models/ussd.model.js";
 import activity from "../utilities/activity.js";
+import autoSendMessage from "../utilities/autoSendMessage.js";
 const allDevice = async (req, res, next) => {
   try {
     // console.log(req.user);
     let devices;
     if (req.user.isAdmin === 1) {
       const { id } = req.query;
-      devices = await DeviceModel.find({ user: id });
+      let query = {};
+      if (id !== "All") {
+        query.user = id;
+      }
+      devices = await DeviceModel.find(query);
     } else {
       devices = await DeviceModel.find({ user: req.user._id });
     }
@@ -36,7 +41,7 @@ const deleteDevice = async (req, res, next) => {
       await UssdModel.deleteMany({ deviceID: device._id });
     }
     const devices = await DeviceModel.find();
-    await activity(req.user._id, "ลบอุปกรณ์");
+    await activity(req, "ลบอุปกรณ์");
     res.json({
       success: true,
       data: devices,
@@ -76,7 +81,7 @@ const updateDeviceById = async (req, res, next) => {
     if (!device) {
       throw new Error("Device not found");
     }
-    await activity(req.user._id, "แก้ไขอุปกรณ์");
+    await activity(req, "แก้ไขอุปกรณ์");
     res.json({
       success: true,
       data: device,
@@ -99,10 +104,27 @@ const countMessageByDevice = async (req, res, next) => {
   }
 };
 
+const motivate = async (req, res, next) => {
+  try {
+    autoSendMessage(req.app.io, "Queued", req.user._id);
+    const timer = setTimeout(() => {
+      clearTimeout(timer);
+      res.json({
+        success: true,
+        data: null,
+        error: null,
+      });
+    }, 2000);
+  } catch (e) {
+    next(e);
+  }
+};
+
 export default {
   allDevice,
   deleteDevice,
   findDeviceById,
   updateDeviceById,
   countMessageByDevice,
+  motivate,
 };

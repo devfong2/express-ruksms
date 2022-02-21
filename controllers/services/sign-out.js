@@ -20,10 +20,8 @@ export default async (req, res) => {
       type: "signOut",
       androidId: req.body.androidId,
     });
-    await activity(
-      device.user,
-      `อุปกรณ์ ${device.name || device.model} ออกจากระบบ`
-    );
+    req.user = { _id: device.user };
+    await activity(req, `อุปกรณ์ ${device.name || device.model} ออกจากระบบ`);
   }
   res.json({
     success: true,

@@ -6,7 +6,7 @@ export default async (req, res, next) => {
     const user = await UserModel.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
     });
-    await activity(req.user._id, `แก้ไขข้อมูลผู้ใช้ของ ${user.email}`);
+    await activity(req, `แก้ไขข้อมูลผู้ใช้ของ ${user.email}`);
     res.json({
       success: true,
       data: user,

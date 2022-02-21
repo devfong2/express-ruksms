@@ -81,7 +81,8 @@ export default async (req, res, next) => {
     // console.log(html);
 
     await sendMail("Register success ✔️", user.email, htmlToSend);
-    await activity(user._id, `สมัครสมาชิกเรียบร้อย`);
+    req.user = { _id: user._id };
+    await activity(req, `สมัครสมาชิกเรียบร้อย`);
     res.json({
       success: true,
       data: null,

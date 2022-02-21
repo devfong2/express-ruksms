@@ -111,7 +111,7 @@ const sendMessage = async (req, res, next) => {
       }
     }
     await updateDashboard(req);
-    await activity(req.user._id, `ส่งข้อความ ${result.length} ข้อความ`);
+    await activity(req, `ส่งข้อความ ${result.length} ข้อความ`);
 
     res.json({
       success: true,
@@ -176,9 +176,26 @@ const checkCountDeviceAndSend = async (user, groupID, senders, prioritize) => {
 
 const deleteMessage = async (req, res, next) => {
   try {
-    const { idForDelete } = req.body;
-    await MessageModel.deleteMany({ _id: { $in: idForDelete } });
-    await activity(req.user._id, `ลบข้อความ ${idForDelete.length} ข้อความ`);
+    const { idForDelete, user, status, mode } = req.body;
+    const query = {};
+    if (status !== "All") {
+      query.status = status;
+    }
+    let result;
+    if (mode === "selected") {
+      result = await MessageModel.deleteMany({ _id: { $in: idForDelete } });
+    } else {
+      if (req.user.isAdmin === 1) {
+        result = await MessageModel.deleteMany({ user, ...query });
+      } else {
+        result = await MessageModel.deleteMany({
+          user: req.user._id,
+          ...query,
+        });
+      }
+    }
+    console.log(result);
+    await activity(req, `ลบข้อความ ${result.deletedCount} ข้อความ`);
     res.json({
       success: true,
       data: null,
@@ -199,6 +216,9 @@ const allMessage = async (req, res, next) => {
         $lt: new Date(endDate),
       },
     };
+    if (user !== "All") {
+      query.user = user;
+    }
     if (mobileNumber !== "") {
       query.number = new RegExp(mobileNumber);
     }
@@ -217,10 +237,7 @@ const allMessage = async (req, res, next) => {
     // console.log(query);
     let messages;
     if (req.user.isAdmin === 1) {
-      messages = await MessageModel.find({
-        user,
-        ...query,
-      })
+      messages = await MessageModel.find(query)
         .sort({
           sentDate: -1,
         })
@@ -228,6 +245,9 @@ const allMessage = async (req, res, next) => {
           "ID number message schedule sentDate deliveredDate status simSlot -_id"
         );
     } else {
+      if (query.user) {
+        delete query.user;
+      }
       messages = await MessageModel.find({
         user: req.user._id,
         ...query,
@@ -267,6 +287,9 @@ const searchMessage = async (req, res, next) => {
         $lt: new Date(endDate),
       },
     };
+    if (user !== "All") {
+      query.user = user;
+    }
     if (mobileNumber !== "") {
       query.number = new RegExp(mobileNumber);
     }
@@ -286,33 +309,21 @@ const searchMessage = async (req, res, next) => {
     let messages;
     let count = 0;
     if (req.user.isAdmin === 1) {
-      messages = await MessageModel.find({
-        user,
-        ...query,
-      })
+      messages = await MessageModel.find(query)
         .sort({
           sentDate: -1,
         })
         .limit(50)
         .skip(page * 50);
-      count = await MessageModel.find({
-        user,
-        ...query,
-      }).countDocuments();
+      count = await MessageModel.find(query).countDocuments();
     } else {
-      messages = await MessageModel.find({
-        user: req.user._id,
-        ...query,
-      })
+      messages = await MessageModel.find(query)
         .sort({
           sentDate: -1,
         })
         .limit(50)
         .skip(page * 50);
-      count = await MessageModel.find({
-        user: req.user._id,
-        ...query,
-      }).countDocuments();
+      count = await MessageModel.find(query).countDocuments();
     }
     res.json({
       success: true,

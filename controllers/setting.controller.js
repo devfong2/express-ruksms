@@ -4,6 +4,7 @@ import config from "../config/index.js";
 import uploadImage, { checkBase64Format } from "../utilities/upload-image.js";
 import updateDashboard from "../utilities/update-dashboard.js";
 import activity from "../utilities/activity.js";
+
 const allSetting = async (req, res, next) => {
   try {
     const settings = await SettingModel.find();
@@ -25,7 +26,7 @@ const updateSetting = async (req, res, next) => {
       { value },
       { new: true }
     );
-    await activity(req.user._id, `แก้ไขการตั้งค่า ${name}`);
+    await activity(req, `แก้ไขการตั้งค่า ${name}`);
     res.json({
       success: true,
       data: setting,
@@ -63,7 +64,7 @@ const updateSettingWebSite = async (req, res, next) => {
       },
       { new: true }
     );
-    await activity(req.user._id, `แก้ไขการตั้งค่า ${website.name}`);
+    await activity(req, `แก้ไขการตั้งค่า ${website.name}`);
     res.json({
       success: true,
       data: newWebsite,
@@ -94,6 +95,7 @@ const websiteData = async (req, res, next) => {
 const dashBoardData = async (req, res, next) => {
   try {
     const count = await updateDashboard(req);
+    // const ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
 
     res.json({
       success: true,

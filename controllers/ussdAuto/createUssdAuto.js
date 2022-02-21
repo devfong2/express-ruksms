@@ -34,10 +34,7 @@ export default async (req, res, next) => {
       }
     }
     await result.populate("device", "name model sims");
-    await activity(
-      req.user._id,
-      "สร้างรายการส่งข้อความอัตโนมัติ " + result.request
-    );
+    await activity(req, "สร้างรายการส่งข้อความอัตโนมัติ " + result.request);
     res.status(201).json({
       success: true,
       data: result,

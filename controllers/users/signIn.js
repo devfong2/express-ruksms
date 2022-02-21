@@ -30,7 +30,8 @@ export default async (req, res, next) => {
 
       user.lastLogin = new Date();
       await user.save();
-      await activity(user.id, `เข้าสู่ระบบ`);
+      req.user = { _id: user.id };
+      await activity(req, `เข้าสู่ระบบ`);
     } else if (key) {
       // console.log(key);
       const user = await UserModel.findOne({ apiKey: key });

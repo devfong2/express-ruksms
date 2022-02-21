@@ -3,9 +3,14 @@ import DeviceModel from "../models/device.model.js";
 import UserModel from "../models/user.model.js";
 import processUssdRequest from "./send-ussd.js";
 import updateDashboard from "./update-dashboard.js";
-export default async (io) => {
+export default async (io, status = "Pending", user = "None") => {
   try {
-    const messages = await MessageModel.find({ status: "Pending" });
+    const query = {};
+    query.status = status;
+    if (user !== "None") {
+      query.user = user;
+    }
+    const messages = await MessageModel.find(query);
     if (messages.length !== 0) {
       const totalGroup = groupByGroupId(messages);
       totalGroup.map(async (group) => {

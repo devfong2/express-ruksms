@@ -15,7 +15,8 @@ export default async (req, res, next) => {
     }
     user.password = await hashPassword(newPassword);
     await user.save();
-    await activity(user.id, `เปลี่ยนรหัสผ่านเรียบร้อย`);
+    req.user = { _id: user.id };
+    await activity(req, `เปลี่ยนรหัสผ่านเรียบร้อย`);
     res.json({
       success: true,
       data: user,

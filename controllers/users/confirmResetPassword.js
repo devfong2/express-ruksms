@@ -38,10 +38,8 @@ export default async (req, res, next) => {
     // console.log(html);
 
     await sendMail("Reset password success 🔓", result.email, htmlToSend);
-    await activity(
-      result.id,
-      `เปลี่ยนรหัสผ่านจากลิ้งก์รีเซ็ทรหัสผ่านเรียบร้อย`
-    );
+    req.user = { _id: result.id };
+    await activity(req, `เปลี่ยนรหัสผ่านจากลิ้งก์รีเซ็ทรหัสผ่านเรียบร้อย`);
     res.json({
       success: true,
       data: null,
