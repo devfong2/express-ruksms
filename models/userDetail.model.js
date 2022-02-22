@@ -18,6 +18,7 @@ const userDetailSchema = new mongoose.Schema({
     default: 1,
   },
   suspendDetail: String,
+  address: String,
 });
 
 export default mongoose.model("user-detail", userDetailSchema);

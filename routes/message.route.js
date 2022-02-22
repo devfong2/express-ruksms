@@ -5,4 +5,5 @@ messageRoute.post("/", messageController.allMessage);
 messageRoute.post("/send-message", messageController.sendMessage);
 messageRoute.post("/delete", messageController.deleteMessage);
 messageRoute.post("/search", messageController.searchMessage);
+messageRoute.post("/resend", messageController.resendMessage);
 export default messageRoute;
