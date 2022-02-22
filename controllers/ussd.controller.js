@@ -55,14 +55,16 @@ const allUssd = async (req, res, next) => {
           .populate("deviceID")
           .populate("userID")
           .limit(15)
-          .skip(page * 15);
+          .skip(page * 15)
+          .sort({ sendDate: -1 });
         totalItems = await UssdModel.find().count();
       } else {
         ussds = await UssdModel.find({ userID: id })
           .populate("deviceID")
           .populate("userID")
           .limit(15)
-          .skip(page * 15);
+          .skip(page * 15)
+          .sort({ sendDate: -1 });
         totalItems = await UssdModel.find({ userID: id }).count();
       }
     } else {
@@ -70,7 +72,8 @@ const allUssd = async (req, res, next) => {
         .populate("deviceID")
         .populate("userID")
         .limit(15)
-        .skip(page * 15);
+        .skip(page * 15)
+        .sort({ sendDate: -1 });
       totalItems = await UssdModel.find({ userID: req.user._id }).count();
     }
     res.json({
@@ -102,11 +105,13 @@ const deleteUssd = async (req, res, next) => {
         .populate("deviceID")
         .populate("userID")
         .limit(15)
-        .skip(page * 15);
+        .skip(page * 15)
+        .sort({ sendDate: -1 });
     } else {
       ussds = await UssdModel.find({ userID: req.user._id })
         .populate("deviceID")
-        .populate("userID");
+        .populate("userID")
+        .sort({ sendDate: -1 });
     }
     await activity(req, "ลบข้อมูลการส่งรหัส USSD");
     res.json({

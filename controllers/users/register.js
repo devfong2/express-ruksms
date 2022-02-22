@@ -12,7 +12,7 @@ import activity from "../../utilities/activity.js";
 import UserDetailModel from "../../models/userDetail.model.js";
 export default async (req, res, next) => {
   try {
-    const { name, password, email, phone, knownFrom } = req.body;
+    const { name, password, email, phone, knownFrom, address } = req.body;
     const allUser = await UserModel.find();
     const findUser = allUser.find((a) => a.email === email);
     const findPhone = allUser.find((a) => a.phone === phone);
@@ -54,6 +54,7 @@ export default async (req, res, next) => {
     await UserDetailModel.create({
       user: user._id,
       knownFrom,
+      address,
     });
     const html = fs.readFileSync(
       path.join(path.resolve(), "email/registration.html"),

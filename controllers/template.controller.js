@@ -44,4 +44,23 @@ const deleteTemplate = async (req, res, next) => {
   }
 };
 
-export default { createTemplate, allTemplate, deleteTemplate };
+const updateTemplate = async (req, res, next) => {
+  try {
+    const { name, message } = req.body;
+    const template = await TemplateModel.findByIdAndUpdate(
+      req.params.id,
+      { name, message },
+      { new: true }
+    );
+    await activity(req, "แก้ไขแม่แบบการส่งข้อความ " + template.name);
+    res.json({
+      success: true,
+      data: template,
+      error: null,
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
+export default { createTemplate, allTemplate, deleteTemplate, updateTemplate };

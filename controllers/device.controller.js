@@ -106,7 +106,12 @@ const countMessageByDevice = async (req, res, next) => {
 
 const motivate = async (req, res, next) => {
   try {
-    autoSendMessage(req.app.io, "Queued", req.user._id);
+    await MessageModel.updateMany(
+      { user: req.user._id, status: "Queued" },
+      { status: "Pending" }
+    );
+    autoSendMessage(req.app.io, "Pending", req.user._id);
+    await activity(req, "สั่งกระตุ้นข้อความ");
     const timer = setTimeout(() => {
       clearTimeout(timer);
       res.json({
@@ -114,7 +119,7 @@ const motivate = async (req, res, next) => {
         data: null,
         error: null,
       });
-    }, 2000);
+    }, 1500);
   } catch (e) {
     next(e);
   }
