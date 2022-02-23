@@ -7,6 +7,7 @@ const activitySchema = new mongoose.Schema({
   activity: String,
   ipAddress: String,
   date: Date,
+  ipAddressDetail: Object,
 });
 
 export default mongoose.model("activity", activitySchema);

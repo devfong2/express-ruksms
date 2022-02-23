@@ -95,7 +95,6 @@ const websiteData = async (req, res, next) => {
 const dashBoardData = async (req, res, next) => {
   try {
     const count = await updateDashboard(req);
-    // const ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
 
     res.json({
       success: true,
