@@ -33,6 +33,12 @@ userRoute.put(
   requiredSignIn,
   userController.updatePassword
 );
+userRoute.put(
+  "/user-detail/:id",
+  requiredSignIn,
+  requiredAdmin,
+  userController.updateUserDetail
+);
 userRoute.post(
   "/delete",
   requiredSignIn,

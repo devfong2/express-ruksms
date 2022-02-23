@@ -10,6 +10,7 @@ import verifyToken from "./verifyToken.js";
 import confirmResetPassword from "./confirmResetPassword.js";
 import getUserDetailByUserId from "./getUserDetailByUserId.js";
 import resetUserData from "./resetUserData.js";
+import updateUserDetail from "./updateUserDetail.js";
 
 const me = (req, res, next) => {
   try {
@@ -36,4 +37,5 @@ export default {
   confirmResetPassword,
   getUserDetailByUserId,
   resetUserData,
+  updateUserDetail,
 };

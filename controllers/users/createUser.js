@@ -7,7 +7,7 @@ import SettingModel from "../../models/setting.model.js";
 import UserDetailModel from "../../models/userDetail.model.js";
 export default async (req, res, next) => {
   try {
-    const { name, password, email, phone } = req.body;
+    const { name, password, email, phone, address } = req.body;
     const allUser = await UserModel.find();
     const findUser = allUser.find((a) => a.email === email);
     const findPhone = allUser.find((a) => a.phone === phone);
@@ -44,6 +44,7 @@ export default async (req, res, next) => {
     await UserDetailModel.create({
       user: user._id,
       knownFrom: "เพื่อน",
+      address,
     });
     await activity(req, `สร้างบัญชีผู้ใช้งาน ${email}`);
 

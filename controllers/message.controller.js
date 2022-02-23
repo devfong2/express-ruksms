@@ -194,8 +194,15 @@ const deleteMessage = async (req, res, next) => {
         });
       }
     }
+    if (result.deletedCount === 0) {
+      throw new Error("ไม่พบข้อความที่ต้องการลบ");
+    }
     // console.log(result);
-    await activity(req, `ลบข้อความ ${result.deletedCount} ข้อความ`);
+
+    await activity(
+      req,
+      `ลบข้อความ ${mode}-${status} จำนวน ${result.deletedCount} ข้อความ`
+    );
     res.json({
       success: true,
       data: null,
@@ -208,32 +215,16 @@ const deleteMessage = async (req, res, next) => {
 
 const allMessage = async (req, res, next) => {
   try {
-    const { user, startDate, endDate, device, status, mobileNumber, message } =
-      req.body;
-    let query = {
-      sentDate: {
-        $gte: new Date(startDate),
-        $lt: new Date(endDate),
-      },
-    };
+    const { user, status } = req.body;
+    let query = {};
     if (user !== "All") {
       query.user = user;
-    }
-    if (mobileNumber !== "") {
-      query.number = new RegExp(mobileNumber);
-    }
-
-    if (message !== "") {
-      query.message = new RegExp(message);
     }
 
     if (status !== "All") {
       query.status = status;
     }
 
-    if (device !== "All") {
-      query.device = device;
-    }
     // console.log(query);
     let messages;
     if (req.user.isAdmin === 1) {
@@ -391,6 +382,10 @@ const resendMessage = async (req, res, next) => {
     const idForRemove = messages.map((m) => m._id);
     await MessageModel.deleteMany({ _id: { $in: idForRemove } });
     await countGroupIdAndSend(messages, user);
+    await activity(
+      req,
+      `ส่งข้อความสถานะ ${status} จำนวน ${messages.length} ข้อความ อีกครั้ง`
+    );
 
     res.json({
       success: true,

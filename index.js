@@ -46,6 +46,8 @@ autoSendUssd(io);
 checkScheduleAndSetTimeOut(io);
 autoSendMessage(io);
 
+// eslint-disable-next-line no-undef
+console.log(`Worker ${process.pid} started...`);
 httpServer.listen(config.PORT, () =>
   console.log("server is listenning on port " + config.PORT)
 );
