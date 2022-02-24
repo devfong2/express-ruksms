@@ -6,9 +6,31 @@ import checkValidate, { signInValidation } from "../middlewares/validator.js";
 
 const userRoute = Router();
 
-userRoute.post("/", requiredSignIn, requiredAdmin, userController.createUser);
-userRoute.get("/", requiredSignIn, userController.allUser);
+//normal user
+userRoute.post("/register", userController.register);
+userRoute.post("/reset-password", userController.resetPassword);
+userRoute.post("/verify-token", userController.verifyToken);
+userRoute.post("/confirm-reset-password", userController.confirmResetPassword);
+userRoute.post(
+  "/sign-in",
+  signInValidation,
+  checkValidate,
+  userController.signIn
+);
+
+//member
+userRoute.post("/sign-out", requiredSignIn, userController.signOut);
 userRoute.get("/me", requiredSignIn, userController.me);
+userRoute.get("/", requiredSignIn, userController.allUser);
+userRoute.put("/:id", requiredSignIn, userController.updateUser);
+userRoute.put(
+  "/update-password/:id",
+  requiredSignIn,
+  userController.updatePassword
+);
+
+//admin
+userRoute.post("/", requiredSignIn, requiredAdmin, userController.createUser);
 userRoute.get(
   "/detail",
   requiredSignIn,
@@ -20,18 +42,6 @@ userRoute.post(
   requiredSignIn,
   requiredAdmin,
   userController.resetUserData
-);
-userRoute.post(
-  "/sign-in",
-  signInValidation,
-  checkValidate,
-  userController.signIn
-);
-userRoute.put("/:id", requiredSignIn, userController.updateUser);
-userRoute.put(
-  "/update-password/:id",
-  requiredSignIn,
-  userController.updatePassword
 );
 userRoute.put(
   "/user-detail/:id",
@@ -45,9 +55,11 @@ userRoute.post(
   requiredAdmin,
   userController.deleteUser
 );
-userRoute.post("/register", userController.register);
-userRoute.post("/reset-password", userController.resetPassword);
-userRoute.post("/verify-token", userController.verifyToken);
-userRoute.post("/confirm-reset-password", userController.confirmResetPassword);
+userRoute.post(
+  "/disguise",
+  requiredSignIn,
+  requiredAdmin,
+  userController.disguise
+);
 
 export default userRoute;
