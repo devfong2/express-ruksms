@@ -1,6 +1,7 @@
 import UserModel from "../models/user.model.js";
 import MessageModel from "../models/message.model.js";
 import UssdModel from "../models/ussd.model.js";
+import DeviceModel from "../models/device.model.js";
 export default (req) => {
   // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve) => {
@@ -17,6 +18,7 @@ export default (req) => {
         ussdPending,
         ussdSent,
         users,
+        deviceInQueued,
       ] = await Promise.all([
         MessageModel.find({
           status: "Pending",
@@ -43,6 +45,7 @@ export default (req) => {
           response: { $ne: "รอดำเนินการ" },
         }).countDocuments(),
         UserModel.find({ isAdmin: { $ne: 1 } }).countDocuments(),
+        findDeviceInQueued(req),
       ]);
       count = {
         pending: messagesPending,
@@ -55,6 +58,7 @@ export default (req) => {
         ussdSent,
         credits: user.credits,
         user: users,
+        deviceInQueued,
       };
     } else {
       const [
@@ -66,6 +70,7 @@ export default (req) => {
         messagesReceived,
         ussdPending,
         ussdSent,
+        deviceInQueued,
       ] = await Promise.all([
         MessageModel.find({
           user: req.user._id,
@@ -99,6 +104,7 @@ export default (req) => {
           userID: req.user._id,
           response: { $ne: "รอดำเนินการ" },
         }).countDocuments(),
+        findDeviceInQueued(req),
       ]);
       count = {
         pending: messagesPending,
@@ -110,6 +116,7 @@ export default (req) => {
         ussdPending,
         ussdSent,
         credits: user.credits,
+        deviceInQueued,
         // user: users,
       };
     }
@@ -121,5 +128,41 @@ export default (req) => {
       count,
     });
     resolve(count);
+  });
+};
+
+const findDeviceInQueued = (req) => {
+  // eslint-disable-next-line no-async-promise-executor
+  return new Promise(async (resolve, reject) => {
+    try {
+      const group = await MessageModel.aggregate([
+        { $match: { status: "Queued", user: req.user._id } },
+        { $group: { _id: "$groupID" } },
+      ]);
+      const data = [];
+      for (let i = 0; i < group.length; i++) {
+        const device = await DeviceModel.findById(group[i]._id.split(".")[1]);
+
+        const mess = await MessageModel.countDocuments({
+          status: "Queued",
+          user: req.user._id,
+          groupID: group[i]._id,
+        });
+
+        data.push({
+          groupID: group[i]._id,
+          value: mess,
+          color: "linear-gradient(to bottom, #fdb954, #fbe05f)",
+          icon: "mdi-clock-time-seven-outline",
+          title: device.name || device.model,
+          deviceID: device.ID,
+        });
+      }
+      data.sort((a, b) => a.deviceID - b.deviceID);
+      // console.log(group);
+      resolve(data);
+    } catch (e) {
+      reject(e);
+    }
   });
 };

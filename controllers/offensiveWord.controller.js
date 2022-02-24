@@ -38,10 +38,11 @@ const deleteOffensiveWord = async (req, res, next) => {
   try {
     const { selectedID } = req.body;
     await OffensiveWordModel.deleteMany({ _id: { $in: selectedID } });
+    const result = await OffensiveWordModel.find();
     await activity(req, `ลบคำต้องห้าม`);
     res.json({
       success: true,
-      data: null,
+      data: result,
       error: null,
     });
   } catch (e) {

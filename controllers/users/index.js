@@ -11,12 +11,27 @@ import confirmResetPassword from "./confirmResetPassword.js";
 import getUserDetailByUserId from "./getUserDetailByUserId.js";
 import resetUserData from "./resetUserData.js";
 import updateUserDetail from "./updateUserDetail.js";
+import disguise from "./disguise.js";
+
+import activity from "../../utilities/activity.js";
 
 const me = (req, res, next) => {
   try {
     res.json({
       success: true,
       data: req.user,
+      error: null,
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+const signOut = async (req, res, next) => {
+  try {
+    await activity(req, `ออกจากระบบ`);
+    res.json({
+      success: true,
+      data: null,
       error: null,
     });
   } catch (e) {
@@ -38,4 +53,6 @@ export default {
   getUserDetailByUserId,
   resetUserData,
   updateUserDetail,
+  disguise,
+  signOut,
 };

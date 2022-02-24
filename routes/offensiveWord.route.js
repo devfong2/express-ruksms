@@ -5,5 +5,5 @@ const offensiveWordRoute = Router();
 offensiveWordRoute.get("/", offensiveWordController.allOffensiveWord);
 offensiveWordRoute.post("/", offensiveWordController.createOffensiveWord);
 offensiveWordRoute.put("/:id", offensiveWordController.updateOffensiveWord);
-offensiveWordRoute.put("/delete", offensiveWordController.deleteOffensiveWord);
+offensiveWordRoute.post("/delete", offensiveWordController.deleteOffensiveWord);
 export default offensiveWordRoute;

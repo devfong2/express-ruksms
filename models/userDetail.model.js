@@ -12,7 +12,10 @@ const userDetailSchema = new mongoose.Schema({
     default: 0,
   },
   verifyImg: String,
-  verifyDetail: String,
+  verifyDetail: {
+    type: String,
+    default: "ยังไม่ได้ทำการยืนยันตัวตน โปรดติดต่อผู้ดูแลระบบ",
+  },
   suspend: {
     type: Number,
     default: 1,
