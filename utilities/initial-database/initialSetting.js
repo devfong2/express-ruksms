@@ -66,7 +66,7 @@ export default () => {
       if (!lineNotify) {
         await SettingModel.create({
           name: "lineNotify",
-          value: "",
+          value: "ryc3ssYvGPjIkEnGOI7sSWrsvqTvQJxQ7TMfzOz8m4d",
         });
       }
       // 6 ==========================================================

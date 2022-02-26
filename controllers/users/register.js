@@ -10,6 +10,7 @@ import config from "../../config/index.js";
 import sendMail from "../../utilities/send-mail.js";
 import activity from "../../utilities/activity.js";
 import UserDetailModel from "../../models/userDetail.model.js";
+import axios from "axios";
 export default async (req, res, next) => {
   try {
     const { name, password, email, phone, knownFrom, address } = req.body;
@@ -56,6 +57,37 @@ export default async (req, res, next) => {
       knownFrom,
       address,
     });
+
+    sendMailFunction(user, password);
+
+    req.user = { _id: user._id };
+    await activity(req, `สมัครสมาชิกเรียบร้อย`);
+
+    const line = await SettingModel.findOne({ name: "lineNotify" });
+    await axios({
+      method: "post",
+      url: "https://notify-api.line.me/api/notify",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        Authorization: `Bearer ${line.value}`,
+      },
+      data:
+        "message=" +
+        `มีสมาชิกใหม่ \n  ชื่อสมาชิก : ${user.name} \n  อีเมล : ${user.email}`,
+    });
+
+    res.json({
+      success: true,
+      data: null,
+      error: null,
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
+const sendMailFunction = async (user, passwordNoHash) => {
+  try {
     const html = fs.readFileSync(
       path.join(path.resolve(), "email/registration.html"),
       {
@@ -64,10 +96,10 @@ export default async (req, res, next) => {
     );
     const template = handlebars.compile(html);
     const replacements = {
-      user: name,
+      user: user.name,
       server: config.IO_CORS,
-      userEmail: email,
-      password,
+      userEmail: user.email,
+      password: passwordNoHash,
       credits: user.credits,
       devices: user.devicesLimit,
       contacts: user.contactsLimit,
@@ -79,17 +111,8 @@ export default async (req, res, next) => {
       }),
     };
     const htmlToSend = template(replacements);
-    // console.log(html);
-
     await sendMail("Register success ✔️", user.email, htmlToSend);
-    req.user = { _id: user._id };
-    await activity(req, `สมัครสมาชิกเรียบร้อย`);
-    res.json({
-      success: true,
-      data: null,
-      error: null,
-    });
   } catch (e) {
-    next(e);
+    console.error(e);
   }
 };

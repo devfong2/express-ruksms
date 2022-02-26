@@ -12,6 +12,8 @@ import getUserDetailByUserId from "./getUserDetailByUserId.js";
 import resetUserData from "./resetUserData.js";
 import updateUserDetail from "./updateUserDetail.js";
 import disguise from "./disguise.js";
+import checkRecaptcha from "./checkRecaptcha.js";
+import reportUser from "./reportUser.js";
 
 import activity from "../../utilities/activity.js";
 
@@ -55,4 +57,6 @@ export default {
   updateUserDetail,
   disguise,
   signOut,
+  checkRecaptcha,
+  reportUser,
 };

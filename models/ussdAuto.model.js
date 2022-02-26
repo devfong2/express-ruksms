@@ -23,6 +23,10 @@ const ussdAutoSchema = new mongoose.Schema({
     type: Number,
     default: 1,
   },
+  round: {
+    type: Number,
+    default: 0,
+  },
   timer: Number,
   date: Date,
   status: String,

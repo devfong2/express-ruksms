@@ -7,12 +7,7 @@ import activity from "../../utilities/activity.js";
 
 export default async (req, res, next) => {
   try {
-    const result = await UssdAutoModel.create({
-      user: req.user._id,
-      ...req.body,
-      date: new Date(),
-      status: "pending",
-    });
+    let result;
     if (req.body.schedule) {
       const present = moment();
       const timeForSend = moment(req.body.schedule);
@@ -21,10 +16,22 @@ export default async (req, res, next) => {
           "The schedule time must be greater than the current time."
         );
       }
+      result = await UssdAutoModel.create({
+        user: req.user._id,
+        ...req.body,
+        date: new Date(),
+        status: "pending",
+      });
       const minute = timeForSend.diff(present, "minutes");
       const secondForSchedule = minute * 60 * 1000;
       waitTimeForSend(result, secondForSchedule, req, next);
     } else {
+      result = await UssdAutoModel.create({
+        user: req.user._id,
+        ...req.body,
+        date: new Date(),
+        status: "pending",
+      });
       if (result.times > 1) {
         sendManyTimes(result, req, next);
       } else {
@@ -45,7 +52,7 @@ export default async (req, res, next) => {
   }
 };
 
-const waitTimeForSend = (ussdAuto, timeout, req, next) => {
+export const waitTimeForSend = (ussdAuto, timeout, req, next) => {
   try {
     const timer = setTimeout(async () => {
       if (ussdAuto.times > 1) {
@@ -95,18 +102,26 @@ const sendUssdRequest = async (ussdAuto, seconds, next) => {
   }
 };
 
-const sendManyTimes = async (ussdAuto, req, next) => {
+export const sendManyTimes = async (ussdAuto, req, next) => {
   try {
-    for (let i = 0; i < ussdAuto.times; i++) {
-      await sendUssdRequest(ussdAuto, ussdAuto.timer, next);
-      if (i === ussdAuto.times - 1) {
-        ussdAuto.status = "success";
-        await ussdAuto.save();
-      } else {
-        ussdAuto.status = "No. " + (i + 1) + " success";
-        await ussdAuto.save();
+    let ussdAuto2 = await UssdAutoModel.findOne({
+      _id: ussdAuto._id,
+      status: { $ne: "stop" },
+    });
+    while (ussdAuto2 && ussdAuto2.round < ussdAuto2.times) {
+      await sendUssdRequest(ussdAuto2, ussdAuto2.timer, next);
+      ussdAuto2.round += 1;
+      if (ussdAuto2.round === ussdAuto2.times) {
+        ussdAuto2.status = "success";
       }
-      req.app.io.emit("updateUssdAuto", ussdAuto);
+      await ussdAuto2.save();
+      if (ussdAuto2.status !== "stop") {
+        req.app.io.emit("updateUssdAuto", ussdAuto2);
+      }
+      ussdAuto2 = await UssdAutoModel.findOne({
+        _id: ussdAuto._id,
+        status: { $ne: "stop" },
+      });
     }
   } catch (e) {
     next(e);
