@@ -87,7 +87,6 @@ const userSchema = new mongoose.Schema(
       default: null,
     },
     phone: String,
-    knownFrom: String,
   },
   { toJSON: { virtuals: true } }
 );

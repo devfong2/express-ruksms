@@ -14,7 +14,6 @@ import settingRoute from "./setting.route.js";
 import subscriptionRoute from "./subscription.route.js";
 import ussdAutoRoute from "./ussdAuto.route.js";
 import offensiveWordRoute from "./offensiveWord.route.js";
-import requiredAdmin from "../middlewares/requiredAdmin.js";
 
 const router = express.Router();
 
@@ -30,6 +29,6 @@ router.use("/plan", planRoute);
 router.use("/setting", settingRoute);
 router.use("/subscription", requiredSignIn, subscriptionRoute);
 router.use("/ussd-auto", requiredSignIn, ussdAutoRoute);
-router.use("/offensiveword", requiredSignIn, requiredAdmin, offensiveWordRoute);
+router.use("/offensiveword", requiredSignIn, offensiveWordRoute);
 
 export default router;
