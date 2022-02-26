@@ -61,6 +61,22 @@ export default () => {
           },
         });
       }
+      // 5 ==========================================================
+      const lineNotify = await SettingModel.findOne({ name: "lineNotify" });
+      if (!lineNotify) {
+        await SettingModel.create({
+          name: "lineNotify",
+          value: "",
+        });
+      }
+      // 6 ==========================================================
+      const verifySwitch = await SettingModel.findOne({ name: "verifySwitch" });
+      if (!verifySwitch) {
+        await SettingModel.create({
+          name: "verifySwitch",
+          value: true,
+        });
+      }
       resolve(true);
     } catch (e) {
       reject(e);

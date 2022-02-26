@@ -107,7 +107,7 @@ const countMessageByDevice = async (req, res, next) => {
 const motivate = async (req, res, next) => {
   try {
     await MessageModel.updateMany(
-      { user: req.user._id, status: "Queued" },
+      { user: req.user._id, status: "Queued", groupID: req.body.groupID },
       { status: "Pending" }
     );
     autoSendMessage(req.app.io, "Pending", req.user._id);

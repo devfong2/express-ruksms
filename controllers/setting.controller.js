@@ -77,11 +77,14 @@ const updateSettingWebSite = async (req, res, next) => {
 
 const websiteData = async (req, res, next) => {
   try {
+    const verify = await SettingModel.findOne({ name: "verifySwitch" });
     const settings = await SettingModel.findOne({ name: "website" });
     settings.value.logo =
       config.IO_CORS + "/services/website/" + settings.value.logo;
     settings.value.favicon =
       config.IO_CORS + "/services/website/" + settings.value.favicon;
+
+    settings.value.verifySwitch = verify.value;
     res.json({
       success: true,
       data: settings.value,

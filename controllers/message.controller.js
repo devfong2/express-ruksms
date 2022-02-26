@@ -12,6 +12,15 @@ const sendMessage = async (req, res, next) => {
   try {
     const { user } = req;
     const { messages, prioritize, senders, schedule, perMessage } = req.body;
+    const PendingMessage = await MessageModel.countDocuments({
+      user: user._id,
+      status: "Pending",
+    });
+    if (PendingMessage > 0) {
+      throw new Error(
+        "Please wait for the message that you have sent earlier. send successfully first"
+      );
+    }
     // เช็คเครดิต
     let present;
     let timeForSend;
@@ -228,13 +237,9 @@ const allMessage = async (req, res, next) => {
     // console.log(query);
     let messages;
     if (req.user.isAdmin === 1) {
-      messages = await MessageModel.find(query)
-        .sort({
-          sentDate: -1,
-        })
-        .select(
-          "ID number message schedule sentDate deliveredDate status simSlot -_id"
-        );
+      messages = await MessageModel.find(query).select(
+        "ID number message schedule sentDate deliveredDate status simSlot -_id"
+      );
     } else {
       if (query.user) {
         delete query.user;
@@ -242,13 +247,9 @@ const allMessage = async (req, res, next) => {
       messages = await MessageModel.find({
         user: req.user._id,
         ...query,
-      })
-        .sort({
-          sentDate: -1,
-        })
-        .select(
-          "ID number message schedule sentDate deliveredDate status simSlot -_id"
-        );
+      }).select(
+        "ID number message schedule sentDate deliveredDate status simSlot -_id"
+      );
     }
     res.json({
       success: true,

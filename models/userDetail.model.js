@@ -22,6 +22,10 @@ const userDetailSchema = new mongoose.Schema({
   },
   suspendDetail: String,
   address: String,
+  offensiveword: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 export default mongoose.model("user-detail", userDetailSchema);
