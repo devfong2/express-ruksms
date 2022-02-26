@@ -22,4 +22,5 @@ export default {
     nodeEnv === "production"
       ? "https://app.ruksms.com"
       : "http://localhost:3000",
+  GOOGLE_RECAPTCHA_SECRET_KEY: "6Let_qAeAAAAAIMqddpYlmKnF4seXKPlr2sQgAcv",
 };

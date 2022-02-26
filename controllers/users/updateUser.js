@@ -6,7 +6,14 @@ export default async (req, res, next) => {
   try {
     const user = await UserModel.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
-    });
+    })
+      .populate({
+        path: "subscription",
+        populate: {
+          path: "planID",
+        },
+      })
+      .populate("userDetail");
     if (req.body.address) {
       await UserDetailModel.findOneAndUpdate(
         { user: user._id },

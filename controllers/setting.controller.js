@@ -4,7 +4,7 @@ import config from "../config/index.js";
 import uploadImage, { checkBase64Format } from "../utilities/upload-image.js";
 import updateDashboard from "../utilities/update-dashboard.js";
 import activity from "../utilities/activity.js";
-
+// import axios from "axios";
 const allSetting = async (req, res, next) => {
   try {
     const settings = await SettingModel.find();
@@ -85,6 +85,7 @@ const websiteData = async (req, res, next) => {
       config.IO_CORS + "/services/website/" + settings.value.favicon;
 
     settings.value.verifySwitch = verify.value;
+
     res.json({
       success: true,
       data: settings.value,
@@ -120,6 +121,7 @@ const allActivity = async (req, res, next) => {
       error: null,
     });
   } catch (e) {
+    // console.log(e.message);
     next(e);
   }
 };

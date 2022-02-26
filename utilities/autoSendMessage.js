@@ -54,6 +54,7 @@ const sendMessage = async (group, io) => {
     reportDelivery: user.reportDelivery, // from user
     sleepTime: null, // from user
   };
+
   const res = await processUssdRequest(device.token, obj);
   const req = {
     user: {

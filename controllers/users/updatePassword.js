@@ -5,7 +5,14 @@ comparePassword;
 export default async (req, res, next) => {
   try {
     const { currentPassword, newPassword } = req.body;
-    const user = await UserModel.findById(req.params.id);
+    const user = await UserModel.findById(req.params.id)
+      .populate({
+        path: "subscription",
+        populate: {
+          path: "planID",
+        },
+      })
+      .populate("userDetail");
     if (!user) {
       throw new Error("user not found");
     }

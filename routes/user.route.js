@@ -11,6 +11,7 @@ userRoute.post("/register", userController.register);
 userRoute.post("/reset-password", userController.resetPassword);
 userRoute.post("/verify-token", userController.verifyToken);
 userRoute.post("/confirm-reset-password", userController.confirmResetPassword);
+userRoute.post("/check-recaptcha", userController.checkRecaptcha);
 userRoute.post(
   "/sign-in",
   signInValidation,
@@ -60,6 +61,13 @@ userRoute.post(
   requiredSignIn,
   requiredAdmin,
   userController.disguise
+);
+
+userRoute.post(
+  "/report-user",
+  requiredSignIn,
+  requiredAdmin,
+  userController.reportUser
 );
 
 export default userRoute;
