@@ -63,19 +63,6 @@ export default async (req, res, next) => {
     req.user = { _id: user._id };
     await activity(req, `สมัครสมาชิกเรียบร้อย`);
 
-    const line = await SettingModel.findOne({ name: "lineNotify" });
-    await axios({
-      method: "post",
-      url: "https://notify-api.line.me/api/notify",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        Authorization: `Bearer ${line.value}`,
-      },
-      data:
-        "message=" +
-        `มีสมาชิกใหม่ \n  ชื่อสมาชิก : ${user.name} \n  อีเมล : ${user.email}`,
-    });
-
     res.json({
       success: true,
       data: null,
@@ -88,6 +75,18 @@ export default async (req, res, next) => {
 
 const sendMailFunction = async (user, passwordNoHash) => {
   try {
+    const line = await SettingModel.findOne({ name: "lineNotify" });
+    await axios({
+      method: "post",
+      url: "https://notify-api.line.me/api/notify",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        Authorization: `Bearer ${line.value}`,
+      },
+      data:
+        "message=" +
+        `มีสมาชิกใหม่ \n  ชื่อสมาชิก : ${user.name} \n  อีเมล : ${user.email}`,
+    });
     const html = fs.readFileSync(
       path.join(path.resolve(), "email/registration.html"),
       {

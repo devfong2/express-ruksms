@@ -1,9 +1,9 @@
 import axios from "axios";
 import config from "../config/index.js";
-// axios.defaults.baseURL = config.GATEWAY.FCM;
-// axios.defaults.headers.common["Authorization"] = config.GATEWAY.KEY;
 
 const processUssdRequest = (deviceToken, dataRequest) => {
+  axios.defaults.baseURL = config.GATEWAY.FCM;
+  axios.defaults.headers.common["Authorization"] = config.GATEWAY.KEY;
   // console.log(dataRequest);
   // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
@@ -13,16 +13,16 @@ const processUssdRequest = (deviceToken, dataRequest) => {
         priority: "high",
         data: dataRequest,
       };
-      // const result = await axios.post("", data);
-      const result = await axios({
-        method: "post",
-        url: config.GATEWAY.FCM,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: config.GATEWAY.KEY,
-        },
-        data,
-      });
+      const result = await axios.post("", data);
+      // const result = await axios({
+      //   method: "post",
+      //   url: config.GATEWAY.FCM,
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //     Authorization: config.GATEWAY.KEY,
+      //   },
+      //   data,
+      // });
 
       resolve(result);
     } catch (e) {

@@ -12,6 +12,7 @@ import checkScheduleAndSetTimeOut from "./utilities/checkScheduleAndSetTimeOut.j
 import autoSendUssd from "./utilities/auto-send-ussd.js";
 import autoSendMessage from "./utilities/autoSendMessage.js";
 import initialDatabase from "./utilities/initial-database/index.js";
+import signature from "./middlewares/signature.js";
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.use(express.json({ limit: "50MB" }));
 app.use(express.urlencoded({ extended: false }));
 app.use(passport.initialize());
 app.use(express.static(rootPath));
+app.set("view engine", "ejs");
 
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
@@ -40,7 +42,10 @@ io.on("connection", function (socket) {
   console.log("connection =>", socket.id);
 });
 
-app.use(routes);
+app.get("/", (req, res) => {
+  res.render("index");
+});
+app.use("/", signature, routes);
 app.use(errorHandler);
 autoSendUssd(io);
 checkScheduleAndSetTimeOut(io);

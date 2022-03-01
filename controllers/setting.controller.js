@@ -8,6 +8,7 @@ import activity from "../utilities/activity.js";
 const allSetting = async (req, res, next) => {
   try {
     const settings = await SettingModel.find();
+
     res.json({
       success: true,
       data: settings,
@@ -99,7 +100,6 @@ const websiteData = async (req, res, next) => {
 const dashBoardData = async (req, res, next) => {
   try {
     const count = await updateDashboard(req);
-
     res.json({
       success: true,
       data: count,
