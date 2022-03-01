@@ -1,5 +1,5 @@
 import express from "express";
-import servicesController from "../controllers/services.controller.js";
+import servicesController from "../controllers/services/index.js";
 const servicesRouter = express.Router();
 
 servicesRouter.post("/register-device.php", servicesController.registerDevice);

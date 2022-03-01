@@ -1,4 +1,5 @@
-export default {
+/* eslint-disable no-undef */
+module.exports = {
   apps: [
     {
       name: "express-ruksms",
