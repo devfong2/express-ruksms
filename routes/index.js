@@ -14,21 +14,28 @@ import settingRoute from "./setting.route.js";
 import subscriptionRoute from "./subscription.route.js";
 import ussdAutoRoute from "./ussdAuto.route.js";
 import offensiveWordRoute from "./offensiveWord.route.js";
+import signature from "../middlewares/signature.js";
 
 const router = express.Router();
 
 router.use("/", servicesRouter);
-router.use("/ussd", requiredSignIn, checkExpiry, ussdRouter);
-router.use("/user", userRoute);
-router.use("/device", requiredSignIn, checkExpiry, deviceRoute);
-router.use("/template", requiredSignIn, checkExpiry, templateRoute);
-router.use("/contact-list", requiredSignIn, checkExpiry, contactListRoute);
-router.use("/contact", requiredSignIn, checkExpiry, contactRoute);
-router.use("/message", requiredSignIn, checkExpiry, messageRoute);
-router.use("/plan", planRoute);
-router.use("/setting", settingRoute);
-router.use("/subscription", requiredSignIn, subscriptionRoute);
-router.use("/ussd-auto", requiredSignIn, ussdAutoRoute);
-router.use("/offensiveword", requiredSignIn, offensiveWordRoute);
+router.use("/ussd", signature, requiredSignIn, checkExpiry, ussdRouter);
+router.use("/user", signature, userRoute);
+router.use("/device", signature, requiredSignIn, checkExpiry, deviceRoute);
+router.use("/template", signature, requiredSignIn, checkExpiry, templateRoute);
+router.use(
+  "/contact-list",
+  signature,
+  requiredSignIn,
+  checkExpiry,
+  contactListRoute
+);
+router.use("/contact", signature, requiredSignIn, checkExpiry, contactRoute);
+router.use("/message", signature, requiredSignIn, checkExpiry, messageRoute);
+router.use("/plan", signature, planRoute);
+router.use("/setting", signature, settingRoute);
+router.use("/subscription", signature, requiredSignIn, subscriptionRoute);
+router.use("/ussd-auto", signature, requiredSignIn, ussdAutoRoute);
+router.use("/offensiveword", signature, requiredSignIn, offensiveWordRoute);
 
 export default router;
