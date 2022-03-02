@@ -15,7 +15,7 @@ export default async (req, res, next) => {
     let query = {
       sentDate: {
         $gte: new Date(startDate),
-        $lt: new Date(endDate),
+        $lte: new Date(endDate),
       },
     };
     if (user !== "All") {

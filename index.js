@@ -12,7 +12,7 @@ import checkScheduleAndSetTimeOut from "./utilities/checkScheduleAndSetTimeOut.j
 import autoSendUssd from "./utilities/auto-send-ussd.js";
 import autoSendMessage from "./utilities/autoSendMessage.js";
 import initialDatabase from "./utilities/initial-database/index.js";
-import signature from "./middlewares/signature.js";
+import notFound from "./middlewares/notFound.js";
 
 const app = express();
 
@@ -45,7 +45,9 @@ io.on("connection", function (socket) {
 app.get("/", (req, res) => {
   res.render("index");
 });
-app.use("/", signature, routes);
+app.get("/v1", (req, res) => res.send("API"));
+app.use("/", routes);
+app.use("*", notFound);
 app.use(errorHandler);
 autoSendUssd(io);
 checkScheduleAndSetTimeOut(io);
