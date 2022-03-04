@@ -1,5 +1,5 @@
 import { Router } from "express";
-import contactListController from "../controllers/contactList.controller.js";
+import contactListController from "../../controllers/contactList.controller.js";
 const contactListRoute = Router();
 
 contactListRoute.get("/", contactListController.allContactList);

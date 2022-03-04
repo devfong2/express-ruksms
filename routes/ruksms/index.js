@@ -1,5 +1,5 @@
 import express from "express";
-import requiredSignIn from "../middlewares/authenticate.js";
+import requiredSignIn from "../../middlewares/authenticate.js";
 import servicesRouter from "./services.route.js";
 import ussdRouter from "./ussd.route.js";
 import userRoute from "./user.route.js";
@@ -8,13 +8,14 @@ import templateRoute from "./template.route.js";
 import contactListRoute from "./contactList.route.js";
 import contactRoute from "./contact.route.js";
 import messageRoute from "./message.route.js";
-import checkExpiry from "../middlewares/expiryDate.js";
+import checkExpiry from "../../middlewares/expiryDate.js";
 import planRoute from "./plan.route.js";
 import settingRoute from "./setting.route.js";
 import subscriptionRoute from "./subscription.route.js";
 import ussdAutoRoute from "./ussdAuto.route.js";
 import offensiveWordRoute from "./offensiveWord.route.js";
-import signature from "../middlewares/signature.js";
+import signature from "../../middlewares/signature.js";
+import paymentRoute from "./payment.route.js";
 
 const router = express.Router();
 
@@ -37,5 +38,6 @@ router.use("/setting", signature, settingRoute);
 router.use("/subscription", signature, requiredSignIn, subscriptionRoute);
 router.use("/ussd-auto", signature, requiredSignIn, ussdAutoRoute);
 router.use("/offensiveword", signature, requiredSignIn, offensiveWordRoute);
+router.use("/payment", signature, requiredSignIn, paymentRoute);
 
 export default router;

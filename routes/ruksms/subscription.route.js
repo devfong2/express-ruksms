@@ -1,6 +1,6 @@
 import { Router } from "express";
-import subscriptionController from "../controllers/subscription.controller.js";
-import requiredAdmin from "../middlewares/requiredAdmin.js";
+import subscriptionController from "../../controllers/subscription.controller.js";
+import requiredAdmin from "../../middlewares/requiredAdmin.js";
 const subscriptionRoute = Router();
 subscriptionRoute.post(
   "/",

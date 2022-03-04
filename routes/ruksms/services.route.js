@@ -1,6 +1,6 @@
 import express from "express";
-import servicesController from "../controllers/services/index.js";
-import signature from "../middlewares/signature.js";
+import servicesController from "../../controllers/services/index.js";
+import signature from "../../middlewares/signature.js";
 const servicesRouter = express.Router();
 
 servicesRouter.post(

@@ -1,6 +1,6 @@
 import { Router } from "express";
-import offensiveWordController from "../controllers/offensiveWord.controller.js";
-import requiredAdmin from "../middlewares/requiredAdmin.js";
+import offensiveWordController from "../../controllers/offensiveWord.controller.js";
+import requiredAdmin from "../../middlewares/requiredAdmin.js";
 const offensiveWordRoute = Router();
 
 offensiveWordRoute.get("/", offensiveWordController.allOffensiveWord);
