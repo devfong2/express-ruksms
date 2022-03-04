@@ -1,7 +1,7 @@
 import { Router } from "express";
-import settingController from "../controllers/setting.controller.js";
-import requiredSignIn from "../middlewares/authenticate.js";
-import requiredAdmin from "../middlewares/requiredAdmin.js";
+import settingController from "../../controllers/setting.controller.js";
+import requiredSignIn from "../../middlewares/authenticate.js";
+import requiredAdmin from "../../middlewares/requiredAdmin.js";
 const settingRoute = Router();
 settingRoute.get(
   "/",

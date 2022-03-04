@@ -24,4 +24,11 @@ export default {
       : "http://localhost:3000",
   GOOGLE_RECAPTCHA_SECRET_KEY: "6Let_qAeAAAAAIMqddpYlmKnF4seXKPlr2sQgAcv",
   SERVER_URL: "https://api.ruksms.com",
+  GBPRIME: {
+    BASE_URL: "https://api.gbprimepay.com",
+    PUBLIC_KEY: "R2a1NghMehY0AkDq5WDYo7h6fb5lHFgu",
+    SECRET_KEY: "bYWoaSMS3JYK82qCsDZ2XvakmK8msjr8",
+    TOKEN:
+      "cI4VjsIAzeYyFMRIuzulfOtjSA50U0tE7w3/K9Ogo2dI/hKWK2b5AVfBVe2NNhQUVvYCyhuev7DesmrmaWzAXrFGtlx6wwc9pf8U/bU3gXA17etXGpWt55A0X7ezfrRCEwy+wHZGTvs6LOaK31NMnFXUQdY=",
+  },
 };

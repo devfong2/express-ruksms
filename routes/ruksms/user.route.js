@@ -1,8 +1,10 @@
 import { Router } from "express";
-import userController from "../controllers/users/index.js";
-import requiredSignIn from "../middlewares/authenticate.js";
-import requiredAdmin from "../middlewares/requiredAdmin.js";
-import checkValidate, { signInValidation } from "../middlewares/validator.js";
+import userController from "../../controllers/users/index.js";
+import requiredSignIn from "../../middlewares/authenticate.js";
+import requiredAdmin from "../../middlewares/requiredAdmin.js";
+import checkValidate, {
+  signInValidation,
+} from "../../middlewares/validator.js";
 
 const userRoute = Router();
 

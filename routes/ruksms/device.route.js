@@ -1,6 +1,6 @@
 import { Router } from "express";
 import rateLimit from "express-rate-limit";
-import deviceController from "../controllers/device.controller.js";
+import deviceController from "../../controllers/device.controller.js";
 const deviceRoute = Router();
 
 const apiLimiter = rateLimit({

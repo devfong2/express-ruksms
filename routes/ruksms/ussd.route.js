@@ -1,5 +1,5 @@
 import express from "express";
-import ussdController from "../controllers/ussd.controller.js";
+import ussdController from "../../controllers/ussd.controller.js";
 const ussdRouter = express.Router();
 
 ussdRouter.post("/send-request", ussdController.sendUssdRequest);

@@ -7,7 +7,7 @@ import { createServer } from "http";
 import config from "./config/index.js";
 import connectDatabase from "./database/index.js";
 import errorHandler from "./middlewares/errorHandler.js";
-import routes from "./routes/index.js";
+import routesRuksm from "./routes/ruksms/index.js";
 import checkScheduleAndSetTimeOut from "./utilities/checkScheduleAndSetTimeOut.js";
 import autoSendUssd from "./utilities/auto-send-ussd.js";
 import autoSendMessage from "./utilities/autoSendMessage.js";
@@ -46,7 +46,11 @@ app.get("/", (req, res) => {
   res.render("index");
 });
 app.get("/v1", (req, res) => res.send("API"));
-app.use("/", routes);
+app.get("/qr-code", (req, res) => {
+  console.log(req.body);
+  res.send("qr-code");
+});
+app.use("/", routesRuksm);
 app.use("*", notFound);
 app.use(errorHandler);
 autoSendUssd(io);
