@@ -99,6 +99,7 @@ const websiteData = async (req, res, next) => {
 
 const dashBoardData = async (req, res, next) => {
   try {
+    // console.log(req.headers.referer);
     const count = await updateDashboard(req);
     res.json({
       success: true,

@@ -52,6 +52,12 @@ userRoute.put(
   requiredAdmin,
   userController.updateUserDetail
 );
+userRoute.get(
+  "/user-detail",
+  requiredSignIn,
+  requiredAdmin,
+  userController.allUserDetail
+);
 userRoute.post(
   "/delete",
   requiredSignIn,

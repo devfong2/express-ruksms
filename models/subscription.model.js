@@ -29,6 +29,8 @@ const subscriptionSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "user",
   },
+  gbpReferenceNo: String,
+  referenceNo: String,
 });
 
 export default mongoose.model("subscription", subscriptionSchema);
