@@ -1,3 +1,4 @@
-// import qrCode from "./qrCode.js";
+import success from "./success.js";
+import generateReference from "./generateReference.js";
 
-// export default { qrCode };
+export default { success, generateReference };

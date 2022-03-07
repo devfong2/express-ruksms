@@ -38,6 +38,6 @@ router.use("/setting", signature, settingRoute);
 router.use("/subscription", signature, requiredSignIn, subscriptionRoute);
 router.use("/ussd-auto", signature, requiredSignIn, ussdAutoRoute);
 router.use("/offensiveword", signature, requiredSignIn, offensiveWordRoute);
-router.use("/payment", signature, requiredSignIn, paymentRoute);
+router.use("/payment", paymentRoute);
 
 export default router;

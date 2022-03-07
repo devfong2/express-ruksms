@@ -6,13 +6,21 @@ import PlanModel from "../../models/plan.model.js";
 import SubscriptionModel from "../../models/subscription.model.js";
 import sendMail from "../../utilities/send-mail.js";
 import activity from "../../utilities/activity.js";
+import checkReferenceNo from "../../utilities/gbprime/checkReferenceNo.js";
 export default async (req, res, next) => {
   try {
-    const { referenceNo, gbpReferenceNo, customerEmail, detail } = req.body;
+    const { referenceNo, gbpReferenceNo, customerEmail, detail, paymentType } =
+      req.body;
 
-    const checkRef = await SubscriptionModel.findOne({ referenceNo });
-    if (checkRef) {
-      throw new Error("Reference No already exist");
+    const checkRefHis = await SubscriptionModel.findOne({ referenceNo });
+    if (checkRefHis) {
+      throw new Error("Reference Number already exist");
+    }
+
+    const checkRefFromGBP = await checkReferenceNo(referenceNo);
+    console.log(checkRefFromGBP);
+    if (checkRefFromGBP.status !== "S") {
+      throw new Error("you haven't paid");
     }
 
     const plan = await PlanModel.findById(detail);
@@ -45,6 +53,7 @@ export default async (req, res, next) => {
       expiryDate: new Date().setDate(new Date().getDate() + day),
       gbpReferenceNo,
       referenceNo,
+      paymentMethod: findPaymentMethod(paymentType),
     });
     if (user.credits !== null) {
       if (plan.credits !== null) {
@@ -98,4 +107,41 @@ const sendMailPaymentSuccess = async (user) => {
   // console.log(html);
 
   await sendMail("Upgrade account success 💰", user.email, htmlToSend);
+};
+
+const findPaymentMethod = (type) => {
+  let result = "";
+  switch (type) {
+    case "C":
+      result = "Credit Card Full payment";
+      break;
+    case "R":
+      result = "Recurring";
+      break;
+    case "I":
+      result = "Credit Card Installment";
+      break;
+    case "Q":
+      result = "Qr Cash";
+      break;
+    case "B":
+      result = "Bill Payment";
+      break;
+    case "W":
+      result = "Wechat";
+      break;
+    case "L":
+      result = "Line Payment";
+      break;
+    case "T":
+      result = "True Wallet";
+      break;
+    case "M":
+      result = "Mobile Banking";
+      break;
+    case "D":
+      result = "Direct Debit";
+      break;
+  }
+  return result;
 };

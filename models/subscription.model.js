@@ -30,7 +30,7 @@ const subscriptionSchema = new mongoose.Schema({
     ref: "user",
   },
   gbpReferenceNo: String,
-  referenceNo: String,
+  referenceNo: { type: String, unique: true },
 });
 
 export default mongoose.model("subscription", subscriptionSchema);
