@@ -2,6 +2,7 @@ import UserModel from "../models/user.model.js";
 import MessageModel from "../models/message.model.js";
 import UssdModel from "../models/ussd.model.js";
 import DeviceModel from "../models/device.model.js";
+import SubscriptionModel from "../models/subscription.model.js";
 export default (req) => {
   // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve) => {
@@ -19,6 +20,7 @@ export default (req) => {
         ussdSent,
         users,
         deviceInQueued,
+        Income,
       ] = await Promise.all([
         MessageModel.find({
           status: "Pending",
@@ -46,7 +48,10 @@ export default (req) => {
         }).countDocuments(),
         UserModel.find({ isAdmin: { $ne: 1 } }).countDocuments(),
         findDeviceInQueued(req),
+        SubscriptionModel.find({ referenceNo: { $ne: null } }).select("amount"),
       ]);
+      let earning = 0;
+      Income.map((i) => (earning += i.amount));
       count = {
         pending: messagesPending,
         scheduled: messagesScheduled,
@@ -59,6 +64,7 @@ export default (req) => {
         credits: user.credits,
         user: users,
         deviceInQueued,
+        earning,
       };
     } else {
       const [

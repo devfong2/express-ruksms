@@ -31,6 +31,7 @@ const subscriptionSchema = new mongoose.Schema({
   },
   gbpReferenceNo: String,
   referenceNo: { type: String, unique: true },
+  amount: { type: Number, default: 0 },
 });
 
 export default mongoose.model("subscription", subscriptionSchema);
