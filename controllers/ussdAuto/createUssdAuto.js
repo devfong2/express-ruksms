@@ -12,10 +12,12 @@ export default async (req, res, next) => {
       const present = moment();
       const timeForSend = moment(req.body.schedule);
       if (timeForSend < present) {
+        console.log(req.body.schedule);
         throw new Error(
           "The schedule time must be greater than the current time."
         );
       }
+      // console.log(req.body);
       result = await UssdAutoModel.create({
         user: req.user._id,
         ...req.body,
