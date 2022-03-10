@@ -1,4 +1,5 @@
 import moment from "moment";
+import CryptoJS from "crypto-js";
 import MessageModel from "../../models/message.model.js";
 import DeviceModel from "../../models/device.model.js";
 import UserModel from "../../models/user.model.js";
@@ -77,7 +78,10 @@ export default async (req, res, next) => {
       const obj = {
         ID: maxMessageIdValue,
         number: m.number,
-        message: m.message + messageFooter,
+        message: CryptoJS.AES.encrypt(
+          m.message + messageFooter,
+          user.apiKey
+        ).toString(),
         groupID: `${groupID}.${senders[indexDevice].device}`,
         prioritize,
         userID: req.user.ID,

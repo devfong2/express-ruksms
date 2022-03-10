@@ -5,12 +5,14 @@ export default async () => {
   // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
     try {
-      const usersDetail = await UserDetailModel.find();
+      const usersDetail = await UserDetailModel.find().select("user");
       for (let i = 0; i < usersDetail.length; i++) {
-        if (!usersDetail[i].offensiveword) {
-          await UserDetailModel.findByIdAndUpdate(usersDetail[i]._id, {
-            offensiveword: true,
-          });
+        const user = await (
+          await UserDetailModel.findOne({ user: usersDetail[i].user })
+        ).populate("user", "name");
+        // console.log(user);
+        if (!user.user) {
+          await UserDetailModel.findByIdAndDelete(user._id);
         }
       }
 

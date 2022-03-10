@@ -18,7 +18,6 @@ paymentRoute.post(
   "/update-package",
   signature,
   requiredSignIn,
-
   payment.updatePackage
 );
 

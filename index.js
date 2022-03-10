@@ -13,6 +13,10 @@ import autoSendUssd from "./utilities/auto-send-ussd.js";
 import autoSendMessage from "./utilities/autoSendMessage.js";
 import initialDatabase from "./utilities/initial-database/index.js";
 import notFound from "./middlewares/notFound.js";
+import agentRoute from "./routes/agent/index.js";
+import apiCheck from "./middlewares/agent/apiCheck.js";
+import checkUser from "./middlewares/agent/checkUser.js";
+import chekToken from "./middlewares/agent/chekToken.js";
 
 const app = express();
 
@@ -45,12 +49,8 @@ io.on("connection", function (socket) {
 app.get("/", (req, res) => {
   res.render("index");
 });
-app.get("/v1", (req, res) => res.send("API"));
-app.get("/qr-code", (req, res) => {
-  console.log(req.body);
-  res.send("qr-code");
-});
 app.use("/", routesRuksm);
+app.use("/agent", apiCheck, checkUser, chekToken, agentRoute);
 app.use("*", notFound);
 app.use(errorHandler);
 autoSendUssd(io);

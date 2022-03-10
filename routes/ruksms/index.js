@@ -16,6 +16,7 @@ import ussdAutoRoute from "./ussdAuto.route.js";
 import offensiveWordRoute from "./offensiveWord.route.js";
 import signature from "../../middlewares/signature.js";
 import paymentRoute from "./payment.route.js";
+import apiKeyRoute from "./apikey.route.js";
 
 const router = express.Router();
 
@@ -39,5 +40,6 @@ router.use("/subscription", signature, requiredSignIn, subscriptionRoute);
 router.use("/ussd-auto", signature, requiredSignIn, ussdAutoRoute);
 router.use("/offensiveword", signature, requiredSignIn, offensiveWordRoute);
 router.use("/payment", paymentRoute);
+router.use("/api-key", signature, requiredSignIn, apiKeyRoute);
 
 export default router;

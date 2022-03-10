@@ -87,7 +87,7 @@ const websiteData = async (req, res, next) => {
 
     settings.value.verifySwitch = verify.value;
 
-    res.json({
+    res.status(200).json({
       success: true,
       data: settings.value,
       error: null,
@@ -101,7 +101,7 @@ const dashBoardData = async (req, res, next) => {
   try {
     // console.log(req.headers.referer);
     const count = await updateDashboard(req);
-    res.json({
+    res.status(200).json({
       success: true,
       data: count,
       error: null,
