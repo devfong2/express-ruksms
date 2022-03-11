@@ -1,6 +1,6 @@
-import CryptoJS from "crypto-js";
 import MessageModel from "./../../models/message.model.js";
 import UserModel from "../../models/user.model.js";
+import { decryptData } from "../../utilities/cryptoJs.js";
 export default async (req, res, next) => {
   try {
     // console.log("=======get-message=====");
@@ -15,31 +15,27 @@ export default async (req, res, next) => {
       groupID: groupId,
       status: "Pending",
     }).limit(parseInt(limit));
-    let messages2 = [];
-    if (messages.length !== 0) {
-      const user = await UserModel.findById(messages[0].user);
-      const idForUpdate = messages.map((m) => m._id);
-      await MessageModel.updateMany(
-        {
-          _id: { $in: idForUpdate },
-          status: "Pending",
-        },
-        { status: "Queued", sentDate: new Date() }
-      );
-      messages2 = messages.map((m) => {
-        const obj = m;
-        const decrypted = CryptoJS.AES.decrypt(m.message, user.apiKey);
-        obj.message = decrypted.toString(CryptoJS.enc.Utf8);
-        return obj;
-      });
-      console.log(messages2);
-    }
-    // console.log(messages);
+
+    // if (messages.length !== 0) {
+    const user = await UserModel.findById(messages[0].user);
+    const idForUpdate = messages.map((m) => m._id);
+    await MessageModel.updateMany(
+      {
+        _id: { $in: idForUpdate },
+        status: "Pending",
+      },
+      { status: "Queued", sentDate: new Date() }
+    );
+    const messages2 = await decodeData(messages, user.apiKey);
+    // }
+    // console.log(messages2);
+    // console.log("messages 1" + messages);
+    // console.log("messages 2" + messages2);
     // console.log("=======get-message=====");
     res.json({
       success: true,
       data: {
-        messages2,
+        messages,
         totalCount: messages2.length,
       },
       error: null,
@@ -47,4 +43,14 @@ export default async (req, res, next) => {
   } catch (e) {
     next(e);
   }
+};
+
+const decodeData = (messages, secret) => {
+  const messages2 = messages.map((m) => {
+    const obj = m;
+
+    obj.message = decryptData(m.message, secret);
+    return obj;
+  });
+  return new Promise((resolve) => resolve(messages2));
 };

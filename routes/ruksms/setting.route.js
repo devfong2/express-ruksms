@@ -33,4 +33,11 @@ settingRoute.get(
   requiredAdmin,
   settingController.allActivity
 );
+
+settingRoute.delete(
+  "/activity",
+  requiredSignIn,
+  requiredAdmin,
+  settingController.deleteActivity
+);
 export default settingRoute;

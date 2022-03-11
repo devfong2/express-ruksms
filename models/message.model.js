@@ -75,6 +75,12 @@ const messageSchema = new mongoose.Schema({
   },
   attachments: { type: String, default: null },
   prioritize: { type: Number, required: true, default: 0 },
+  messageLength: { type: Number, required: true, default: 0 },
+  perMessage: { type: Number, required: true, default: 0 },
+  customer: {
+    type: mongoose.Schema.Types.ObjectId,
+    default: null,
+  },
 });
 
 messageSchema.path("type").options.enum;

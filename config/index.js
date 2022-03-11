@@ -31,4 +31,7 @@ export default {
     TOKEN:
       "cI4VjsIAzeYyFMRIuzulfOtjSA50U0tE7w3/K9Ogo2dI/hKWK2b5AVfBVe2NNhQUVvYCyhuev7DesmrmaWzAXrFGtlx6wwc9pf8U/bU3gXA17etXGpWt55A0X7ezfrRCEwy+wHZGTvs6LOaK31NMnFXUQdY=",
   },
+  DATA_SECRET:
+    "b00dfbeb31942c813084472c70408a1bb558ac3b90173eafc7fb2c3e7cf16812",
+  PIN: "MjU0MTA0MTA=",
 };

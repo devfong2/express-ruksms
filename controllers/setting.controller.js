@@ -127,6 +127,25 @@ const allActivity = async (req, res, next) => {
   }
 };
 
+const deleteActivity = async (req, res, next) => {
+  try {
+    const checkPin =
+      // eslint-disable-next-line no-undef
+      req.body.password === Buffer(config.PIN, "base64").toString("utf8");
+    if (!checkPin) {
+      throw new Error(`Incorrect pin`);
+    }
+    await ActivityModel.deleteMany();
+    res.json({
+      success: true,
+      data: null,
+      error: null,
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
 export default {
   allSetting,
   updateSetting,
@@ -134,4 +153,5 @@ export default {
   websiteData,
   dashBoardData,
   allActivity,
+  deleteActivity,
 };

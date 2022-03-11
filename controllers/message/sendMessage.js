@@ -1,5 +1,4 @@
 import moment from "moment";
-import CryptoJS from "crypto-js";
 import MessageModel from "../../models/message.model.js";
 import DeviceModel from "../../models/device.model.js";
 import UserModel from "../../models/user.model.js";
@@ -10,6 +9,7 @@ import updateDashboard from "../../utilities/update-dashboard.js";
 import activity from "../../utilities/activity.js";
 import waitTimeForSend from "./waitTimeForSend.js";
 import checkCountDeviceAndSend from "./checkCountDeviceAndSend.js";
+import { encryptData } from "../../utilities/cryptoJs.js";
 
 export default async (req, res, next) => {
   try {
@@ -78,10 +78,7 @@ export default async (req, res, next) => {
       const obj = {
         ID: maxMessageIdValue,
         number: m.number,
-        message: CryptoJS.AES.encrypt(
-          m.message + messageFooter,
-          user.apiKey
-        ).toString(),
+        message: encryptData(m.message + messageFooter, user.apiKey),
         groupID: `${groupID}.${senders[indexDevice].device}`,
         prioritize,
         userID: req.user.ID,
@@ -92,6 +89,8 @@ export default async (req, res, next) => {
         status: schedule ? "Scheduled" : "Pending",
         schedule: schedule ? schedule : null,
         sentDate: schedule ? schedule : new Date(),
+        perMessage,
+        messageLength: m.message.length,
       };
       manyMessage.push(obj);
       maxMessageIdValue++;

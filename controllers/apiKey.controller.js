@@ -3,13 +3,14 @@ import ApiKeyModel from "../models/apiKey.model.js";
 
 const generateToken = async (req, res, next) => {
   try {
-    const { deviceCriteria, selectDevice, tokenDetail } = req.body;
+    const { deviceCriteria, senders, tokenDetail, prioritize } = req.body;
     const token = jwt.sign(
       {
         user: req.user._id,
         deviceCriteria,
-        selectDevice,
+        senders,
         tokenDetail,
+        prioritize,
       },
       req.user.apiKey
     );

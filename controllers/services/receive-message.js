@@ -3,6 +3,7 @@ import DeviceModel from "../../models/device.model.js";
 import UserModel from "../../models/user.model.js";
 import SettingModel from "../../models/setting.model.js";
 import updateDashboard from "../../utilities/update-dashboard.js";
+import { encryptData } from "../../utilities/cryptoJs.js";
 export default async (req, res, next) => {
   try {
     const { androidId, userId, messages } = req.body;
@@ -27,7 +28,7 @@ export default async (req, res, next) => {
         await MessageModel.create({
           ID: maxMessageIdValue,
           number: messages2[i].number,
-          message: messages2[i].message,
+          message: encryptData(messages2[i].message, user.apiKey),
           userID: user.ID,
           user: user._id,
           deviceID: device.ID,

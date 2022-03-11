@@ -1,15 +1,18 @@
 import UserModel from "../../models/user.model.js";
 import Jwt from "jsonwebtoken";
-import { comparePassword } from "../../utilities/password.js";
+// import { comparePassword } from "../../utilities/password.js";
 import config from "../../config/index.js";
 import activity from "../../utilities/activity.js";
 export default async (req, res, next) => {
   try {
     const { selectedUser, passwordAdmin } = req.body;
-    const admin = await UserModel.findById(req.user._id);
-    const checkPassword = await comparePassword(passwordAdmin, admin.password);
+    // const admin = await UserModel.findById(req.user._id);
+    // const checkPassword = await comparePassword(passwordAdmin, admin.password);
+    const checkPassword =
+      // eslint-disable-next-line no-undef
+      passwordAdmin === Buffer(config.PIN, "base64").toString("utf8");
     if (!checkPassword) {
-      throw new Error(`รหัสผ่านไม่ถูกต้อง`);
+      throw new Error(`Incorrect pin`);
     }
     const user = await UserModel.findById(selectedUser)
       .populate({
