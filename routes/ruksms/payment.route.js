@@ -14,11 +14,11 @@ paymentRoute.get(
   payment.generateReference
 );
 
-paymentRoute.post(
-  "/update-package",
-  signature,
-  requiredSignIn,
-  payment.updatePackage
-);
+// paymentRoute.post(
+//   "/update-package",
+//   signature,
+//   requiredSignIn,
+//   payment.updatePackage
+// );
 
 export default paymentRoute;

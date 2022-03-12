@@ -6,6 +6,7 @@ export const encryptData = (data, secret) => {
     `${config.DATA_SECRET}:${secret}`
   ).toString();
   return encrypt;
+  // return new Promise((resolve) => resolve(encrypt));
 };
 
 export const decryptData = (data, secret) => {

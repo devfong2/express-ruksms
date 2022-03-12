@@ -4,6 +4,9 @@ import config from "../config/index.js";
 import uploadImage, { checkBase64Format } from "../utilities/upload-image.js";
 import updateDashboard from "../utilities/update-dashboard.js";
 import activity from "../utilities/activity.js";
+// import { hashPassword } from "../utilities/password.js";
+// import { decryptData } from "../utilities/cryptoJs.js";
+// import { encryptData } from "../utilities/cryptoJs.js";
 // import axios from "axios";
 const allSetting = async (req, res, next) => {
   try {
@@ -113,6 +116,11 @@ const dashBoardData = async (req, res, next) => {
 
 const allActivity = async (req, res, next) => {
   try {
+    // const enc = await hashPassword(
+    //   "@@aa12345:@@aa12345aa@@:@@dev12345:@@Dev12345"
+    // );
+
+    // console.log(enc);
     const result = await ActivityModel.find()
       .populate("user", "name email")
       .sort({ date: -1 });
