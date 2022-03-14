@@ -29,7 +29,14 @@ export default async (req, res, next) => {
       throw err;
     }
 
-    const user = await UserModel.findById(userId).populate("userDetail");
+    const user = await UserModel.findById(userId)
+      .populate({
+        path: "subscription",
+        populate: {
+          path: "planID",
+        },
+      })
+      .populate("userDetail");
 
     if (!user) {
       const err = new Error("invalid requestUId");

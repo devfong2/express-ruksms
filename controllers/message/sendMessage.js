@@ -14,7 +14,8 @@ import { encryptData } from "../../utilities/cryptoJs.js";
 export default async (req, res, next) => {
   try {
     const { user } = req;
-    const { messages, prioritize, senders, schedule, perMessage } = req.body;
+    const { messages, prioritize, senders, schedule, perMessage, customer } =
+      req.body;
     const PendingMessage = await MessageModel.countDocuments({
       user: user._id,
       status: "Pending",
@@ -80,7 +81,7 @@ export default async (req, res, next) => {
         number: m.number,
         message: encryptData(m.message + messageFooter, user.apiKey),
         groupID: `${groupID}.${senders[indexDevice].device}`,
-        prioritize,
+        prioritize: parseInt(prioritize),
         userID: req.user.ID,
         user: req.user._id,
         deviceID: senders[indexDevice].deviceID,
@@ -89,8 +90,9 @@ export default async (req, res, next) => {
         status: schedule ? "Scheduled" : "Pending",
         schedule: schedule ? schedule : null,
         sentDate: schedule ? schedule : new Date(),
-        perMessage,
+        perMessage: parseInt(perMessage),
         messageLength: m.message.length,
+        customer: customer ? customer : null,
       };
       manyMessage.push(obj);
       maxMessageIdValue++;

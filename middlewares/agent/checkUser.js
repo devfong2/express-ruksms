@@ -1,6 +1,15 @@
 export default async (req, res, next) => {
   try {
     const { user } = req;
+    // เช็คระบบ agent
+    if (!user.subscription.planID.agent) {
+      const err = new Error(
+        "Your account is not authorized to use agent system"
+      );
+      err.statusCode = 402;
+      throw err;
+    }
+
     // เช็คระงับการใช้งาน
     if (user.userDetail[0].suspend === 0) {
       const err = new Error("Your account is suspend");

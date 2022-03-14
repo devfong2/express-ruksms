@@ -40,6 +40,10 @@ const planSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  agent: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 export default mongoose.model("plan", planSchema);
