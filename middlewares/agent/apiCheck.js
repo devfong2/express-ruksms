@@ -13,6 +13,11 @@ export default async (req, res, next) => {
       err.statusCode = 401;
       throw err;
     }
+    if (requestuid.toString().length !== 64) {
+      const err = new Error("Invalid requestUId");
+      err.statusCode = 401;
+      throw err;
+    }
     const decrypted = CryptoJS.AES.decrypt(requestuid, config.JWT_SECRET);
 
     const userId = decrypted.toString(CryptoJS.enc.Utf8);
