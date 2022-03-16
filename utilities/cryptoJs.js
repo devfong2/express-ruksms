@@ -5,8 +5,8 @@ export const encryptData = (data, secret) => {
     JSON.stringify(data),
     `${config.DATA_SECRET}:${secret}`
   ).toString();
-  return encrypt;
-  // return new Promise((resolve) => resolve(encrypt));
+  // return encrypt;
+  return new Promise((resolve) => resolve(encrypt));
 };
 
 export const decryptData = (data, secret) => {
@@ -15,5 +15,6 @@ export const decryptData = (data, secret) => {
     `${config.DATA_SECRET}:${secret}`
   );
   const result = decrypt.toString(CryptoJS.enc.Utf8);
-  return JSON.parse(result);
+  // return JSON.parse(result);
+  return new Promise((resolve) => resolve(JSON.parse(result)));
 };

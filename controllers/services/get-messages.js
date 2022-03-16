@@ -45,12 +45,19 @@ export default async (req, res, next) => {
   }
 };
 
-const decodeData = (messages, secret) => {
-  const messages2 = messages.map((m) => {
-    const obj = m;
+const decodeData = async (messages, secret) => {
+  // const messages2 = messages.map((m) => {
+  //   const obj = m;
 
-    obj.message = decryptData(m.message, secret);
-    return obj;
-  });
+  //   obj.message = decryptData(m.message, secret);
+  //   return obj;
+  // });
+
+  const messages2 = [];
+  for (let i = 0; i < messages.length; i++) {
+    messages[i].message = await decryptData(messages[i].message, secret);
+    messages2.push(messages[i]);
+  }
+
   return new Promise((resolve) => resolve(messages2));
 };

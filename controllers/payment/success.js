@@ -41,13 +41,12 @@ export default async (req, res, next) => {
       throw new Error("Invalid Payment Data");
     }
 
-    const key = `${decryptData(
-      merchantDefined2,
-      config.PAYMENT_SECRET
-    )}:${decryptData(merchantDefined3, config.PAYMENT_SECRET)}:${decryptData(
-      merchantDefined4,
-      config.PAYMENT_SECRET
-    )}:${decryptData(merchantDefined5, config.PAYMENT_SECRET)}`;
+    const decMer2 = await decryptData(merchantDefined2, config.PAYMENT_SECRET);
+    const decMer3 = await decryptData(merchantDefined3, config.PAYMENT_SECRET);
+    const decMer4 = await decryptData(merchantDefined4, config.PAYMENT_SECRET);
+    const decMer5 = await decryptData(merchantDefined5, config.PAYMENT_SECRET);
+
+    const key = `${decMer2}:${decMer3}:${decMer4}:${decMer5}`;
 
     const checkKey = await comparePassword(key, config.PAYMENT_KEY);
     if (!checkKey) {

@@ -25,10 +25,10 @@ export default async (req, res, next) => {
       await maxMessageId.save();
 
       for (let i = 0; i < messages2.length; i++) {
-        await MessageModel.create({
+        const obj = {
           ID: maxMessageIdValue,
           number: messages2[i].number,
-          message: encryptData(messages2[i].message, user.apiKey),
+          message: await encryptData(messages2[i].message, user.apiKey),
           userID: user.ID,
           user: user._id,
           deviceID: device.ID,
@@ -37,7 +37,8 @@ export default async (req, res, next) => {
           status: "Received",
           sentDate: new Date(),
           deliveredDate: new Date(),
-        });
+        };
+        await MessageModel.create(obj);
         maxMessageIdValue++;
         req.user = { _id: user._id };
         await updateDashboard(req);

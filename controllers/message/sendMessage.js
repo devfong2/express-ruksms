@@ -75,11 +75,15 @@ export default async (req, res, next) => {
     }
 
     let indexDevice = 0;
+    const encryptMessage = await encryptData(
+      messages[0].message + messageFooter,
+      user.apiKey
+    );
     messages.map((m) => {
       const obj = {
         ID: maxMessageIdValue,
         number: m.number,
-        message: encryptData(m.message + messageFooter, user.apiKey),
+        message: encryptMessage,
         groupID: `${groupID}.${senders[indexDevice].device}`,
         prioritize: parseInt(prioritize),
         userID: req.user.ID,

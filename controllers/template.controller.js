@@ -16,7 +16,7 @@ const allTemplate = async (req, res, next) => {
 
 const createTemplate = async (req, res, next) => {
   try {
-    req.body.message = encryptData(req.body.message, req.user.apiKey);
+    req.body.message = await encryptData(req.body.message, req.user.apiKey);
     const template = await TemplateModel.create(req.body);
     await activity(req, "สร้างแม่แบบการส่งข้อความ " + template.name);
     res.json({
@@ -49,11 +49,10 @@ const deleteTemplate = async (req, res, next) => {
 const updateTemplate = async (req, res, next) => {
   try {
     const { name, message } = req.body;
-    const template = await TemplateModel.findByIdAndUpdate(
-      req.params.id,
-      { name, message: encryptData(message, req.user.apiKey) },
-      { new: true }
-    );
+    const obj = { name, message: await encryptData(message, req.user.apiKey) };
+    const template = await TemplateModel.findByIdAndUpdate(req.params.id, obj, {
+      new: true,
+    });
     await activity(req, "แก้ไขแม่แบบการส่งข้อความ " + template.name);
     res.json({
       success: true,
