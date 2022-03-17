@@ -1,6 +1,7 @@
 import { Router } from "express";
 import messageController from "../../controllers/message/index.js";
 import checkValidate, {
+  checkFetchMessage,
   sendMessageValidation,
 } from "../../validation/index.js";
 
@@ -18,7 +19,11 @@ agentRoute.post(
   [sendMessageValidation, checkValidate],
   messageController.sendMessage
 );
-agentRoute.post("/", messageController.allMessage);
+agentRoute.post(
+  "/fetch-message",
+  [checkFetchMessage, checkValidate],
+  messageController.fetchMessageForAgent
+);
 // agentRoute.post("/delete", messageController.deleteMessage);
 // agentRoute.post("/search", messageController.searchMessage);
 // agentRoute.post("/resend", messageController.resendMessage);

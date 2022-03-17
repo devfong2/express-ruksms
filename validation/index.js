@@ -1,4 +1,5 @@
 import { validationResult, body } from "express-validator";
+import mongoose from "mongoose";
 
 const checkValidate = (req, res, next) => {
   try {
@@ -35,11 +36,19 @@ export const sendMessageValidation = [
       return Array.isArray(val);
     })
     .withMessage("messages must be array"),
-  body("perMessage")
-    .not()
-    .isEmpty()
-    .isInt()
-    .withMessage("perMessage is required and integer ony"),
+  body("perMessage").not().isEmpty().withMessage("perMessage is required"),
+  body("perMessage").isInt().withMessage("perMessage must be integer only"),
+];
+
+export const checkFetchMessage = [
+  body("ids").not().isEmpty().withMessage("ids is required"),
+  body("ids")
+    .custom((val) => Array.isArray(val))
+    .withMessage("ids must be array"),
+  body("ids").custom((val) =>
+    val.every((item) => mongoose.Types.ObjectId.isValid(item))
+  ),
+  body("select").not().isEmpty().withMessage("select is required"),
 ];
 
 export default checkValidate;
