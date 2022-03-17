@@ -3,7 +3,7 @@ import UserModel from "../../models/user.model.js";
 import { decryptData } from "../../utilities/cryptoJs.js";
 export default async (req, res, next) => {
   try {
-    // console.log("=======get-message=====");
+    console.log("=======get-message=====");
     console.table(req.body);
     const { groupId, limit } = req.body;
     if (!groupId) {
@@ -30,8 +30,9 @@ export default async (req, res, next) => {
     // }
     // console.log(messages2);
     // console.log("messages 1" + messages);
-    // console.log("messages 2" + messages2);
-    // console.log("=======get-message=====");
+    console.log("จำนวนข้อความ ::" + messages2.length);
+
+    console.log("=======get-message=====");
     res.json({
       success: true,
       data: {
