@@ -52,7 +52,9 @@ export default async (req, res, next) => {
     if (!checkKey) {
       throw new Error("Invalid Payment Key");
     }
-    const user = await UserModel.findOne({ email: customerEmail });
+    const user = await UserModel.findOne({ email: customerEmail }).populate(
+      "userDetail"
+    );
     if (!user) {
       throw new Error("User not found");
     }
@@ -142,7 +144,9 @@ const sendMailPaymentSuccess = async (user, plan, amount, paymentType) => {
         user.email
       } \nจำนวนเงิน : ${comma(amount)} บาท \nแพ็กเกจ : ${
         plan.name
-      } \nจ่ายโดย : ${findPaymentMethod(paymentType)} `,
+      } \nจ่ายโดย : ${findPaymentMethod(paymentType)} \nที่อยู่ : ${
+        user.userDetail[0].address || ""
+      }`,
   });
   const html = fs.readFileSync(
     path.join(path.resolve(), "email/userLimitsUpdate.html"),
