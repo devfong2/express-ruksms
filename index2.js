@@ -24,7 +24,8 @@ const cCPUs = os.cpus().length;
 
 if (cluster.isMaster) {
   // Create a worker for each CPU
-  for (let i = 0; i < cCPUs; i++) {
+  //for (let i = 0; i < cCPUs; i++) {
+  for (let i = 0; i < 2; i++) {
     cluster.fork();
   }
   cluster.on("online", function (worker) {

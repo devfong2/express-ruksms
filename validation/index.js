@@ -1,4 +1,4 @@
-import { validationResult, body } from "express-validator";
+import { validationResult, body, param } from "express-validator";
 import mongoose from "mongoose";
 
 const checkValidate = (req, res, next) => {
@@ -50,5 +50,16 @@ export const checkFetchMessage = [
   ),
   body("select").not().isEmpty().withMessage("select is required"),
 ];
+
+export const checkTypeInParam = (arrType) => {
+  return [
+    param("type").not().isEmpty().withMessage("type is required"),
+    param("type")
+      .custom((val) => {
+        return arrType.includes(val);
+      })
+      .withMessage("Invalid type. Must be in " + arrType),
+  ];
+};
 
 export default checkValidate;
