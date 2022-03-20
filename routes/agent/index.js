@@ -20,6 +20,7 @@ agentRoute.post(
   [sendMessageValidation, checkValidate],
   messageController.sendMessage
 );
+agentRoute.post("/resend-message", messageController.resendMessage);
 agentRoute.post(
   "/fetch-message",
   [checkFetchMessage, checkValidate],
@@ -31,6 +32,7 @@ agentRoute.put(
   [checkTypeInParam(["start", "stop"]), checkValidate],
   messageController.startStopMessage
 );
+agentRoute.post("/delete-message", messageController.deleteMessage);
 // agentRoute.post("/delete", messageController.deleteMessage);
 // agentRoute.post("/search", messageController.searchMessage);
 // agentRoute.post("/resend", messageController.resendMessage);

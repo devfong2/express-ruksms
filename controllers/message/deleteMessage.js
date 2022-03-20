@@ -2,11 +2,15 @@ import MessageModel from "../../models/message.model.js";
 import activity from "../../utilities/activity.js";
 export default async (req, res, next) => {
   try {
-    const { idForDelete, user, status, mode } = req.body;
+    const { idForDelete, user, status, mode, customer } = req.body;
     const query = {};
     if (status !== "All") {
       query.status = status;
     }
+    if (customer) {
+      query.customer = customer;
+    }
+    // console.log(query);
     let result;
     if (mode === "selected") {
       result = await MessageModel.deleteMany({ _id: { $in: idForDelete } });

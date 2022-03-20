@@ -1,6 +1,7 @@
 import MessageModel from "./../../models/message.model.js";
 import UserModel from "../../models/user.model.js";
 import { decryptData } from "../../utilities/cryptoJs.js";
+import updateDashboard from "../../utilities/update-dashboard.js";
 export default async (req, res, next) => {
   try {
     console.log("=======get-message=====");
@@ -33,6 +34,8 @@ export default async (req, res, next) => {
     console.log("จำนวนข้อความ ::" + messages2.length);
 
     console.log("=======get-message=====");
+    req.user = { _id: user._id };
+    waitTimeForUpdateFromQueueToSent(messages, req);
     res.json({
       success: true,
       data: {
@@ -46,14 +49,23 @@ export default async (req, res, next) => {
   }
 };
 
+const waitTimeForUpdateFromQueueToSent = (messages, req) => {
+  const timer = setTimeout(async () => {
+    await Promise.all(
+      messages.map((m) =>
+        MessageModel.updateOne(
+          { _id: m._id, status: "Queued" },
+          { status: "Sent" }
+        )
+      )
+    );
+
+    await updateDashboard(req);
+    clearTimeout(timer);
+  }, 1000 * 120);
+};
+
 const decodeData = async (messages, secret) => {
-  // const messages2 = messages.map((m) => {
-  //   const obj = m;
-
-  //   obj.message = decryptData(m.message, secret);
-  //   return obj;
-  // });
-
   const messages2 = [];
   for (let i = 0; i < messages.length; i++) {
     messages[i].message = await decryptData(messages[i].message, secret);
