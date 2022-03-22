@@ -6,7 +6,7 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "dev": "set NODE_ENV=development && nodemon index2.js",
+    "dev": "set NODE_ENV=development && nodemon index.js",
     "prod": "NODE_ENV=production nodemon index.js",
     "safestart": "node --experimental-modules app.mjs"
   },

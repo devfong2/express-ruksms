@@ -58,6 +58,8 @@ export default async (req, res, next) => {
         schedule: null,
         sentDate: new Date(),
         customer: customerAgent ? customerAgent : null,
+        perMessage: m.perMessage,
+        messageLength: m.messageLength,
       };
       manyMessage.push(obj);
       maxMessageIdValue++;
