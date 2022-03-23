@@ -1,4 +1,4 @@
-import { validationResult, body, param } from "express-validator";
+import { validationResult, body, param, query } from "express-validator";
 import mongoose from "mongoose";
 
 const checkValidate = (req, res, next) => {
@@ -61,5 +61,12 @@ export const checkTypeInParam = (arrType) => {
       .withMessage("Invalid type. Must be in " + arrType),
   ];
 };
+
+export const checkGetActivity = [
+  query("page").not().isEmpty().withMessage("page is required"),
+  query("page").isInt().withMessage("page must be integer"),
+  query("itemPerPage").not().isEmpty().withMessage("itemPerPage is required"),
+  query("itemPerPage").isInt().withMessage("itemPerPage must be integer"),
+];
 
 export default checkValidate;

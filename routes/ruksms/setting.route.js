@@ -2,6 +2,7 @@ import { Router } from "express";
 import settingController from "../../controllers/setting.controller.js";
 import requiredSignIn from "../../middlewares/authenticate.js";
 import requiredAdmin from "../../middlewares/requiredAdmin.js";
+import checkValidate, { checkGetActivity } from "../../validation/index.js";
 const settingRoute = Router();
 settingRoute.get(
   "/",
@@ -29,8 +30,7 @@ settingRoute.put(
 );
 settingRoute.get(
   "/activity",
-  requiredSignIn,
-  requiredAdmin,
+  [requiredSignIn, requiredAdmin, checkGetActivity, checkValidate],
   settingController.allActivity
 );
 

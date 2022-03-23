@@ -116,17 +116,19 @@ const dashBoardData = async (req, res, next) => {
 
 const allActivity = async (req, res, next) => {
   try {
-    // const enc = await hashPassword(
-    //   "@@aa12345:@@aa12345aa@@:@@dev12345:@@Dev12345"
-    // );
-
-    // console.log(enc);
-    const result = await ActivityModel.find()
+    const { page, itemPerPage, search } = req.query;
+    const query = {};
+    if (search !== "") {
+      query.activity = new RegExp(search);
+    }
+    const result = await ActivityModel.find(query)
       .populate("user", "name email")
-      .sort({ date: -1 });
+      .sort({ date: -1 })
+      .limit(itemPerPage)
+      .skip(page * itemPerPage);
     res.json({
       success: true,
-      data: result,
+      data: { activities: result, count: result.length },
       error: null,
     });
   } catch (e) {
