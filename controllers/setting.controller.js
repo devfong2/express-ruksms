@@ -4,6 +4,7 @@ import config from "../config/index.js";
 import uploadImage, { checkBase64Format } from "../utilities/upload-image.js";
 import updateDashboard from "../utilities/update-dashboard.js";
 import activity from "../utilities/activity.js";
+import UserModel from "../models/user.model.js";
 // import { hashPassword } from "../utilities/password.js";
 // import { decryptData } from "../utilities/cryptoJs.js";
 // import { encryptData } from "../utilities/cryptoJs.js";
@@ -116,19 +117,71 @@ const dashBoardData = async (req, res, next) => {
 
 const allActivity = async (req, res, next) => {
   try {
-    const { page, itemPerPage, search } = req.query;
-    const query = {};
+    const { page, itemPerPage, searchBy, search } = req.query;
+
+    let result = [];
     if (search !== "") {
-      query.activity = new RegExp(search);
+      if (searchBy === "name") {
+        const users = await UserModel.find({ name: new RegExp(search) }).select(
+          "_id"
+        );
+
+        result = await Promise.all([
+          ActivityModel.find({
+            user: { $in: users.map((user) => user._id) },
+          })
+            .populate("user", "name email")
+            .sort({ date: -1 })
+            .limit(itemPerPage)
+            .skip(page * itemPerPage),
+          ActivityModel.find({
+            user: { $in: users.map((user) => user._id) },
+          }).countDocuments(),
+        ]);
+      } else if (searchBy === "email") {
+        const users = await UserModel.find({
+          email: new RegExp(search),
+        }).select("_id");
+
+        result = await Promise.all([
+          ActivityModel.find({
+            user: { $in: users.map((user) => user._id) },
+          })
+            .populate("user", "name email")
+            .sort({ date: -1 })
+            .limit(itemPerPage)
+            .skip(page * itemPerPage),
+          ActivityModel.find({
+            user: { $in: users.map((user) => user._id) },
+          }).countDocuments(),
+        ]);
+      } else if (searchBy === "activity") {
+        result = await Promise.all([
+          ActivityModel.find({
+            activity: new RegExp(search),
+          })
+            .populate("user", "name email")
+            .sort({ date: -1 })
+            .limit(itemPerPage)
+            .skip(page * itemPerPage),
+          ActivityModel.find({
+            activity: new RegExp(search),
+          }).countDocuments(),
+        ]);
+      }
+    } else {
+      result = await Promise.all([
+        ActivityModel.find()
+          .populate("user", "name email")
+          .sort({ date: -1 })
+          .limit(itemPerPage)
+          .skip(page * itemPerPage),
+        ActivityModel.countDocuments(),
+      ]);
     }
-    const result = await ActivityModel.find(query)
-      .populate("user", "name email")
-      .sort({ date: -1 })
-      .limit(itemPerPage)
-      .skip(page * itemPerPage);
     res.json({
       success: true,
-      data: { activities: result, count: result.length },
+      data: { activities: result[0], count: result[1] },
       error: null,
     });
   } catch (e) {

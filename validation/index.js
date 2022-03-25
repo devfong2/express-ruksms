@@ -67,6 +67,7 @@ export const checkGetActivity = [
   query("page").isInt().withMessage("page must be integer"),
   query("itemPerPage").not().isEmpty().withMessage("itemPerPage is required"),
   query("itemPerPage").isInt().withMessage("itemPerPage must be integer"),
+  query("searchBy").not().isEmpty().withMessage("searchBy is required"),
 ];
 
 export default checkValidate;
