@@ -20,14 +20,27 @@ export default async (req, res, next) => {
     // if (messages.length !== 0) {
     const user = await UserModel.findById(messages[0].user);
     const idForUpdate = messages.map((m) => m._id);
-    await MessageModel.updateMany(
-      {
-        _id: { $in: idForUpdate },
-        status: "Pending",
-      },
-      { status: "Queued", sentDate: new Date() }
-    );
-    const messages2 = await decodeData(messages, user.apiKey);
+    // await MessageModel.updateMany(
+    //   {
+    //     _id: { $in: idForUpdate },
+    //     status: "Pending",
+    //   },
+    //   { status: "Queued", sentDate: new Date() }
+    // );
+    // const messages2 = await decodeData(messages, user.apiKey);
+
+    // eslint-disable-next-line no-unused-vars
+    const [result, messages2] = await Promise.all([
+      MessageModel.updateMany(
+        {
+          _id: { $in: idForUpdate },
+          status: "Pending",
+        },
+        { status: "Queued", sentDate: new Date() }
+      ),
+      decodeData(messages, user.apiKey),
+    ]);
+
     // }
     // console.log(messages2);
     // console.log("messages 1" + messages);

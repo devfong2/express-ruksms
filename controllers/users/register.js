@@ -18,6 +18,7 @@ export default async (req, res, next) => {
     const findUser = allUser.find((a) => a.email === email);
     const findPhone = allUser.find((a) => a.phone === phone);
     const findName = allUser.find((a) => a.name === name);
+
     if (findUser) {
       throw new Error("Email already exist");
     }

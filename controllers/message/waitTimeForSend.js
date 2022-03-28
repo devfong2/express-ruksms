@@ -9,14 +9,23 @@ export default (
   prioritize,
   second,
   totalCredits,
-  req
+  req,
+  customer,
+  perMessage
 ) => {
   const timer = setTimeout(async () => {
     await MessageModel.updateMany(
       { groupID: { $regex: ".*" + groupID + ".*" }, status: "Scheduled" },
       { status: "Pending" }
     );
-    checkCountDeviceAndSend(user, groupID, senders, prioritize);
+    checkCountDeviceAndSend(
+      user,
+      groupID,
+      senders,
+      prioritize,
+      customer,
+      perMessage
+    );
     if (user.credits !== null) {
       const currentCredit = user.credits - totalCredits;
       await UserModel.findByIdAndUpdate(user._id, { credits: currentCredit });

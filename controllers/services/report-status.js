@@ -36,6 +36,7 @@ export default async (req, res, next) => {
       req.user = { _id: oneMessage.user };
       await updateDashboard(req);
     }
+
     // JSON.stringify(req.body.message)
     // console.log("=======report-status=====");
     res.json({
@@ -44,7 +45,6 @@ export default async (req, res, next) => {
       error: null,
     });
   } catch (e) {
-    // console.log(e);
     next(e);
   }
 };

@@ -20,7 +20,7 @@ export default async (req, res, next) => {
       user: user._id,
       status: "Pending",
     });
-    if (PendingMessage > 0) {
+    if (!user.subscription.planID.agent && PendingMessage > 0) {
       throw new Error(
         "Please wait for the message that you have sent earlier. send successfully first"
       );
@@ -40,7 +40,11 @@ export default async (req, res, next) => {
       // console.log(timeForSend.diff(present, "minutes"));
     }
 
-    if (user.credits !== null && user.credits < messages.length * perMessage) {
+    if (
+      user.isAdmin !== 1 &&
+      user.credits !== null &&
+      user.credits < messages.length * perMessage
+    ) {
       const err = new Error("Your credits not enough");
       err.statusCode = 402;
       throw err;
@@ -59,12 +63,13 @@ export default async (req, res, next) => {
     let maxMessageIdValue = maxMessageId.value;
     maxMessageId.value = maxMessageIdValue + messages.length + 1;
     await maxMessageId.save();
-    // group id
-    const groupID = await generateGroupID(50);
-    const manyMessage = [];
+    // group id  message footer
 
-    // message footer
-    const newUser = await SettingModel.findOne({ name: "newUser" });
+    const [newUser, groupID] = await Promise.all([
+      SettingModel.findOne({ name: "newUser" }),
+      generateGroupID(50),
+    ]);
+
     let messageFooter = "";
     if (
       user.contactsLimit !== null &&
@@ -79,6 +84,8 @@ export default async (req, res, next) => {
       messages[0].message + messageFooter,
       user.apiKey
     );
+
+    const manyMessage = [];
     messages.map((m) => {
       const obj = {
         ID: maxMessageIdValue,
@@ -121,17 +128,31 @@ export default async (req, res, next) => {
         prioritize,
         second,
         totalCredits,
-        req
+        req,
+        customer,
+        perMessage
       );
     } else {
-      checkCountDeviceAndSend(user, groupID, senders, prioritize);
+      checkCountDeviceAndSend(
+        user,
+        groupID,
+        senders,
+        prioritize,
+        customer,
+        perMessage
+      );
       if (user.credits !== null) {
         const currentCredit = user.credits - messages.length * perMessage;
         await UserModel.findByIdAndUpdate(user._id, { credits: currentCredit });
       }
     }
-    await updateDashboard(req);
-    await activity(req, `ส่งข้อความ ${result.length} ข้อความ`);
+
+    await Promise.all([
+      updateDashboard(req),
+      activity(req, `ส่งข้อความ ${result.length} ข้อความ`),
+    ]);
+    // await updateDashboard(req);
+    // await activity(req, `ส่งข้อความ ${result.length} ข้อความ`);
 
     res.json({
       success: true,

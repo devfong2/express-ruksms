@@ -1,6 +1,13 @@
 import DeviceModel from "../../models/device.model.js";
 import processUssdRequest from "../../utilities/send-ussd.js";
-export default async (user, groupID, senders, prioritize) => {
+export default async (
+  user,
+  groupID,
+  senders,
+  prioritize,
+  customer,
+  perMessage
+) => {
   const devices = [];
   senders.map((s) => {
     const sameDevice = devices.find((d) => d === s.device);
@@ -9,20 +16,37 @@ export default async (user, groupID, senders, prioritize) => {
     }
   });
   // console.log(devices);
+  const devicesInDB = await Promise.all(
+    devices.map((d) => DeviceModel.findById(d))
+  );
 
-  for (let i = 0; i < devices.length; i++) {
-    const device = await DeviceModel.findById(devices[i]);
-    if (!device) {
-      break;
-    }
-    const obj = {
-      delay: user.delay, // from user
-      groupId: `${groupID}.${devices[i]}`,
-      prioritize,
-      reportDelivery: user.reportDelivery, // from user
-      sleepTime: null, // from user
-    };
-    await processUssdRequest(device.token, obj);
-    // console.log(result.data);
-  }
+  await Promise.all(
+    devicesInDB.map((d) => {
+      const obj = {
+        delay: customer ? perMessage * 2 : user.delay, // from user and agent customer
+        groupId: `${groupID}.${d._id}`,
+        prioritize,
+        reportDelivery: user.reportDelivery, // from user
+        sleepTime: null, // from user
+      };
+      // console.log(obj);
+      return processUssdRequest(d.token, obj);
+    })
+  );
+
+  // for (let i = 0; i < devices.length; i++) {
+  //   const device = await DeviceModel.findById(devices[i]);
+  //   if (!device) {
+  //     break;
+  //   }
+  //   const obj = {
+  //     delay: customer ? perMessage * 2 : user.delay, // from user and agent customer
+  //     groupId: `${groupID}.${devices[i]}`,
+  //     prioritize,
+  //     reportDelivery: user.reportDelivery, // from user
+  //     sleepTime: null, // from user
+  //   };
+  //   await processUssdRequest(device.token, obj);
+  //   // console.log(result.data);
+  // }
 };
