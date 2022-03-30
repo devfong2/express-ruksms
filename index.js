@@ -14,9 +14,12 @@ import autoSendMessage from "./utilities/autoSendMessage.js";
 import initialDatabase from "./utilities/initial-database/index.js";
 import notFound from "./middlewares/notFound.js";
 import agentRoute from "./routes/agent/index.js";
-import apiCheck from "./middlewares/agent/apiCheck.js";
+import agentCheck from "./middlewares/agent/agentCheck.js";
 import checkUser from "./middlewares/agent/checkUser.js";
 import chekToken from "./middlewares/agent/chekToken.js";
+import apiRoute from "./routes/api/index.js";
+import apiCheck from "./middlewares/agent/apiCheck.js";
+import visite from "./middlewares/visite.js";
 
 const app = express();
 
@@ -28,8 +31,8 @@ rootPath = path.join(rootPath, "public");
 
 //ความปลอดภัยของ server
 app.use(helmet());
-app.use(express.json({ limit: "50MB" }));
-app.use(express.urlencoded({ extended: false }));
+app.use(express.json({ limit: "256mb" }));
+app.use(express.urlencoded({ limit: "256mb", extended: false }));
 app.use(passport.initialize());
 app.use(express.static(rootPath));
 app.set("view engine", "ejs");
@@ -49,8 +52,10 @@ io.on("connection", function (socket) {
 app.get("/", (req, res) => {
   res.render("index");
 });
+app.use(visite);
 app.use("/", routesRuksm);
-app.use("/agent", apiCheck, checkUser, chekToken, agentRoute);
+app.use("/agent", agentCheck, checkUser, chekToken, agentRoute);
+app.use("/v1", apiCheck, apiRoute);
 app.use("*", notFound);
 app.use(errorHandler);
 autoSendUssd(io);
