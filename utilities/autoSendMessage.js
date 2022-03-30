@@ -13,9 +13,10 @@ export default async (io, status = "Pending", user = "None") => {
     const messages = await MessageModel.find(query);
     if (messages.length !== 0) {
       const totalGroup = groupByGroupId(messages);
-      totalGroup.map(async (group) => {
-        await sendMessage(group, io);
-      });
+      // totalGroup.map(async (group) => {
+      //   await sendMessage(group, io);
+      // });
+      await Promise.all(totalGroup.map((group) => sendMessage(group, io)));
     }
   } catch (e) {
     console.error(e);
@@ -45,8 +46,12 @@ const groupByGroupId = (messages) => {
 };
 
 const sendMessage = async (group, io) => {
-  const user = await UserModel.findById(group.message[0].user);
-  const device = await DeviceModel.findById(group.message[0].device);
+  // const user = await UserModel.findById(group.message[0].user);
+  // const device = await DeviceModel.findById(group.message[0].device);
+  const [user, device] = await Promise.all([
+    UserModel.findById(group.message[0].user),
+    DeviceModel.findById(group.message[0].device),
+  ]);
   const obj = {
     delay: user.delay, // from user
     groupId: group.groupID,
@@ -55,7 +60,7 @@ const sendMessage = async (group, io) => {
     sleepTime: null, // from user
   };
 
-  const res = await processUssdRequest(device.token, obj);
+  // const res = await processUssdRequest(device.token, obj);
   const req = {
     user: {
       _id: user._id,
@@ -64,6 +69,10 @@ const sendMessage = async (group, io) => {
       io,
     },
   };
-  await updateDashboard(req);
-  return new Promise((resolve) => resolve(res));
+  // await updateDashboard(req);
+  await Promise.all([
+    processUssdRequest(device.token, obj),
+    updateDashboard(req),
+  ]);
+  return new Promise((resolve) => resolve(true));
 };

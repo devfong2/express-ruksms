@@ -64,13 +64,17 @@ export default async (req, res, next) => {
 
 const waitTimeForUpdateFromQueueToSent = (messages, req) => {
   const timer = setTimeout(async () => {
-    await Promise.all(
-      messages.map((m) =>
-        MessageModel.updateOne(
-          { _id: m._id, status: "Queued" },
-          { status: "Sent" }
-        )
-      )
+    // await Promise.all(
+    //   messages.map((m) =>
+    //     MessageModel.updateOne(
+    //       { _id: m._id, status: "Queued" },
+    //       { status: "Sent" }
+    //     )
+    //   )
+    // );
+    await MessageModel.updateMany(
+      { _id: { $in: messages.map((m) => m._id) }, status: "Queued" },
+      { status: "Sent", sentDate: new Date() }
     );
 
     await updateDashboard(req);
