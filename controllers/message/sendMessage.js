@@ -11,8 +11,9 @@ import waitTimeForSend from "./waitTimeForSend.js";
 import checkCountDeviceAndSend from "./checkCountDeviceAndSend.js";
 import { encryptData } from "../../utilities/cryptoJs.js";
 
-export default async (req, res, next) => {
+export default async (req, res, next, api = false) => {
   try {
+    console.log(api);
     const { user } = req;
     const { messages, prioritize, senders, schedule, perMessage, customer } =
       req.body;
@@ -153,10 +154,30 @@ export default async (req, res, next) => {
     ]);
     // await updateDashboard(req);
     // await activity(req, `ส่งข้อความ ${result.length} ข้อความ`);
+    let resultPresend = [];
+    if (api) {
+      // const resultApi = []
+      resultPresend = result.map((r) => ({
+        ID: r.ID,
+        number: r.number,
+        message: messages[0].message,
+        schedule: r.schedule,
+        sentDate: r.sentDate,
+        deliveredDate: r.deliveredDate,
+        status: r.status,
+        resultCode: r.resultCode,
+        errorCode: r.errorCode,
+        userID: r.userID,
+        deviceID: r.deviceID,
+        simSlot: r.simSlot,
+      }));
+    } else {
+      resultPresend = result;
+    }
 
     res.json({
       success: true,
-      data: result,
+      data: resultPresend,
       error: null,
     });
   } catch (e) {

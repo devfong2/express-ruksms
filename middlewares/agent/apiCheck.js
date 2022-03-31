@@ -20,6 +20,7 @@ export default async (req, res, next) => {
       throw err;
     }
     // console.log(req.headers);
+    // console.log(req.headers["content-type"]);
     if (!requestuid) {
       const err = new Error("requestUId is required");
       err.statusCode = 401;
@@ -73,9 +74,14 @@ export default async (req, res, next) => {
     // console.log(publicKeyIsUserId);
     // console.log(secretKeyInAuth);
 
-    const user = await UserModel.findById(publicKeyIsUserId).populate(
-      "userDetail"
-    );
+    const user = await UserModel.findById(publicKeyIsUserId)
+      .populate({
+        path: "subscription",
+        populate: {
+          path: "planID",
+        },
+      })
+      .populate("userDetail");
     // console.log(user);
 
     if (!user) {
