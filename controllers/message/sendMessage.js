@@ -13,7 +13,7 @@ import { encryptData } from "../../utilities/cryptoJs.js";
 
 export default async (req, res, next, api = false) => {
   try {
-    console.log(api);
+    // console.log(api);
     const { user } = req;
     const { messages, prioritize, senders, schedule, perMessage, customer } =
       req.body;
