@@ -119,7 +119,7 @@ const findDeviceInQueued = (req) => {
       );
       // console.log(devices);
       const data = [];
-      console.log(group);
+      // console.log(group);
       group.map((g, i) =>
         data.push({
           value: g.count,

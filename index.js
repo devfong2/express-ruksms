@@ -1,5 +1,6 @@
 import express from "express";
 import passport from "passport";
+import cors from "cors";
 import path from "path";
 import helmet from "helmet";
 import { Server } from "socket.io";
@@ -19,7 +20,7 @@ import checkUser from "./middlewares/agent/checkUser.js";
 import chekToken from "./middlewares/agent/chekToken.js";
 import apiRoute from "./routes/api/index.js";
 import apiCheck from "./middlewares/agent/apiCheck.js";
-import visite from "./middlewares/visite.js";
+// import visite from "./middlewares/visite.js";
 
 const app = express();
 
@@ -52,10 +53,10 @@ io.on("connection", function (socket) {
 app.get("/", (req, res) => {
   res.render("index");
 });
-app.use(visite);
+// app.use(visite);
 app.use("/", routesRuksm);
 app.use("/agent", agentCheck, checkUser, chekToken, agentRoute);
-app.use("/v1", apiCheck, apiRoute);
+app.use("/v1", cors(), apiCheck, apiRoute);
 app.use("*", notFound);
 app.use(errorHandler);
 autoSendUssd(io);
