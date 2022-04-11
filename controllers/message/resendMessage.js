@@ -14,7 +14,7 @@ export default async (req, res, next) => {
         messages = await MessageModel.find({
           _id: { $in: messagesSelect.map((m) => m._id) },
         });
-        console.log(messages);
+        // console.log(messages);
       } else {
         messages = messagesSelect;
       }
@@ -24,7 +24,11 @@ export default async (req, res, next) => {
         status,
       });
     }
-    if (user.credits !== null && user.credits < messages.length) {
+    if (
+      user.isAdmin !== 1 &&
+      user.credits !== null &&
+      user.credits < messages.length
+    ) {
       const err = new Error("Your credits not enough");
       err.statusCode = 402;
       throw err;
@@ -64,15 +68,29 @@ export default async (req, res, next) => {
       manyMessage.push(obj);
       maxMessageIdValue++;
     });
-    await MessageModel.insertMany(manyMessage);
 
     const idForRemove = messages.map((m) => m._id);
-    await MessageModel.deleteMany({ _id: { $in: idForRemove } });
-    await countGroupIdAndSend(messages, user);
-    await activity(
-      req,
-      `ส่งข้อความสถานะ ${status} จำนวน ${messages.length} ข้อความ อีกครั้ง`
-    );
+    // await MessageModel.insertMany(manyMessage);
+    // await MessageModel.deleteMany({ _id: { $in: idForRemove } });
+    // await countGroupIdAndSend(messages, user);
+    // await activity(
+    //   req,
+    //   `ส่งข้อความสถานะ ${status} จำนวน ${messages.length} ข้อความ อีกครั้ง`
+    // );
+
+    await Promise.all([
+      MessageModel.insertMany(manyMessage),
+      MessageModel.deleteMany({ _id: { $in: idForRemove } }),
+      countGroupIdAndSend(messages, user),
+      activity(
+        req,
+        `ส่งข้อความสถานะ ${status} จำนวน ${messages.length} ข้อความ อีกครั้ง`
+      ),
+    ]);
+    if (user.isAdmin !== 1 && user.credits !== null) {
+      user.credits -= messages.length;
+      await user.save();
+    }
 
     res.json({
       success: true,

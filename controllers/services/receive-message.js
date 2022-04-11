@@ -16,6 +16,7 @@ export default async (req, res, next) => {
     const device = await DeviceModel.findOne({ androidId });
     const user = await UserModel.findOne({ ID: userId });
     // console.log(req.body);
+    const userForUpdateDashboard = [];
     if (user && device && device.available !== false) {
       const messages2 = JSON.parse(messages);
 
@@ -40,10 +41,15 @@ export default async (req, res, next) => {
         };
         await MessageModel.create(obj);
         maxMessageIdValue++;
-        req.user = { _id: user._id };
-        await updateDashboard(req);
+        // req.user = { _id: user._id };
+        // await updateDashboard(req);
+        const index = userForUpdateDashboard.findIndex((u) => u === user._id);
+        if (index === -1) {
+          userForUpdateDashboard.push(user._id);
+        }
       }
     }
+    updateUserDashboard(req, userForUpdateDashboard);
     // console.log("=========Receive-message===========");
     res.json({
       success: true,
@@ -53,5 +59,18 @@ export default async (req, res, next) => {
   } catch (e) {
     console.error(e.message);
     next(e);
+  }
+};
+
+const updateUserDashboard = async (req, userForUpdateDashboard) => {
+  try {
+    await Promise.all(
+      userForUpdateDashboard.map((u) => {
+        req.user = { _id: u };
+        return updateDashboard(req);
+      })
+    );
+  } catch (e) {
+    console.log(e);
   }
 };
