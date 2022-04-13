@@ -2,7 +2,7 @@ import MessageModel from "../../models/message.model.js";
 import DeviceModel from "../../models/device.model.js";
 import UserModel from "../../models/user.model.js";
 import SettingModel from "../../models/setting.model.js";
-import updateDashboard from "../../utilities/update-dashboard.js";
+// import updateDashboard from "../../utilities/update-dashboard.js";
 import { encryptData } from "../../utilities/cryptoJs.js";
 export default async (req, res, next) => {
   try {
@@ -49,7 +49,7 @@ export default async (req, res, next) => {
         }
       }
     }
-    updateUserDashboard(req, userForUpdateDashboard);
+    // updateUserDashboard(req, userForUpdateDashboard);
     // console.log("=========Receive-message===========");
     res.json({
       success: true,
@@ -62,15 +62,15 @@ export default async (req, res, next) => {
   }
 };
 
-const updateUserDashboard = async (req, userForUpdateDashboard) => {
-  try {
-    await Promise.all(
-      userForUpdateDashboard.map((u) => {
-        req.user = { _id: u };
-        return updateDashboard(req);
-      })
-    );
-  } catch (e) {
-    console.log(e);
-  }
-};
+// const updateUserDashboard = async (req, userForUpdateDashboard) => {
+//   try {
+//     await Promise.all(
+//       userForUpdateDashboard.map((u) => {
+//         req.user = { _id: u };
+//         return updateDashboard(req);
+//       })
+//     );
+//   } catch (e) {
+//     console.log(e);
+//   }
+// };

@@ -16,7 +16,11 @@ export default async (req, res, next) => {
       result = await MessageModel.deleteMany({ _id: { $in: idForDelete } });
     } else {
       if (req.user.isAdmin === 1) {
-        result = await MessageModel.deleteMany({ user, ...query });
+        result = await MessageModel.deleteMany({
+          user: user,
+          ...query,
+        });
+        console.log("delete \n", user, query);
       } else {
         result = await MessageModel.deleteMany({
           user: req.user._id,
@@ -27,12 +31,12 @@ export default async (req, res, next) => {
     if (result.deletedCount === 0) {
       throw new Error("ไม่พบข้อความที่ต้องการลบ");
     }
-    // console.log(result);
-
     await activity(
       req,
       `ลบข้อความ ${mode}-${status} จำนวน ${result.deletedCount} ข้อความ`
     );
+    // console.log(result);
+
     res.json({
       success: true,
       data: null,

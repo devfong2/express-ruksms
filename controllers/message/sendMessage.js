@@ -81,17 +81,48 @@ export default async (req, res, next, api = false) => {
     }
 
     let indexDevice = 0;
-    const encryptMessage = await encryptData(
-      messages[0].message + messageFooter,
-      user.apiKey
-    );
+    // const encryptMessage = await encryptData(
+    //   messages[0].message + messageFooter,
+    //   user.apiKey
+    // );
 
     const manyMessage = [];
-    messages.map((m) => {
+    // messages.map((m) => {
+    //   const obj = {
+    //     ID: maxMessageIdValue,
+    //     number: m.number,
+    //     message: encryptMessage,
+    //     groupID: `${groupID}.${senders[indexDevice].device}`,
+    //     prioritize: parseInt(prioritize),
+    //     userID: req.user.ID,
+    //     user: req.user._id,
+    //     deviceID: senders[indexDevice].deviceID,
+    //     device: senders[indexDevice].device,
+    //     simSlot: senders[indexDevice].simSlot,
+    //     status: schedule ? "Scheduled" : "Pending",
+    //     schedule: schedule ? schedule : null,
+    //     sentDate: schedule ? schedule : new Date(),
+    //     perMessage: parseInt(perMessage),
+    //     messageLength: m.message.length,
+    //     customer: customer ? customer : null,
+    //   };
+    //   manyMessage.push(obj);
+    //   maxMessageIdValue++;
+
+    //   // เช็คว่าเวียนจำนวนเครืองหรือยัง
+    //   indexDevice++;
+    //   if (indexDevice > senders.length - 1) {
+    //     indexDevice = 0;
+    //   }
+    // });
+    for (let i = 0; i < messages.length; i++) {
       const obj = {
         ID: maxMessageIdValue,
-        number: m.number,
-        message: encryptMessage,
+        number: messages[i].number,
+        message: await encryptData(
+          messages[i].message + messageFooter,
+          user.apiKey
+        ),
         groupID: `${groupID}.${senders[indexDevice].device}`,
         prioritize: parseInt(prioritize),
         userID: req.user.ID,
@@ -103,7 +134,7 @@ export default async (req, res, next, api = false) => {
         schedule: schedule ? schedule : null,
         sentDate: schedule ? schedule : new Date(),
         perMessage: parseInt(perMessage),
-        messageLength: m.message.length,
+        messageLength: messages[i].message.length,
         customer: customer ? customer : null,
       };
       manyMessage.push(obj);
@@ -114,7 +145,7 @@ export default async (req, res, next, api = false) => {
       if (indexDevice > senders.length - 1) {
         indexDevice = 0;
       }
-    });
+    }
 
     const result = await MessageModel.insertMany(manyMessage);
 
@@ -144,6 +175,7 @@ export default async (req, res, next, api = false) => {
       );
       if (user.credits !== null) {
         const currentCredit = user.credits - messages.length * perMessage;
+        // console.log(currentCredit);
         await UserModel.findByIdAndUpdate(user._id, { credits: currentCredit });
       }
     }

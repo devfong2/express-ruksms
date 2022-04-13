@@ -7,7 +7,7 @@ import processUssdRequest from "../../utilities/send-ussd.js";
 export default async (req, res, next) => {
   try {
     const { messagesSelect, status, customerAgent } = req.body;
-    const user = UserModel.findById(req.user._id);
+    const user = await UserModel.findById(req.user._id);
     let messages = [];
     if (status === "selected") {
       if (customerAgent) {
@@ -78,7 +78,7 @@ export default async (req, res, next) => {
     //   `ส่งข้อความสถานะ ${status} จำนวน ${messages.length} ข้อความ อีกครั้ง`
     // );
 
-    await Promise.all([
+    const result = await Promise.all([
       MessageModel.insertMany(manyMessage),
       MessageModel.deleteMany({ _id: { $in: idForRemove } }),
       countGroupIdAndSend(messages, user),
@@ -88,13 +88,15 @@ export default async (req, res, next) => {
       ),
     ]);
     if (user.isAdmin !== 1 && user.credits !== null) {
-      user.credits -= messages.length;
+      let netCredits = 0;
+      messages.map((m) => (netCredits += m.perMessage));
+      user.credits -= netCredits;
       await user.save();
     }
 
     res.json({
       success: true,
-      data: null,
+      data: result[0],
       error: null,
     });
     //  if(user.credits !== null )

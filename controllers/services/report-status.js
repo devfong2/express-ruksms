@@ -26,9 +26,9 @@ export default async (req, res, next) => {
       );
       if (messages[i].status === "Failed") {
         const user = await UserModel.findById(oneMessage.user);
-        const plusCredit = Math.ceil(oneMessage.message.length / 70);
+        // const plusCredit = Math.ceil(oneMessage.message.length / 70);
         if (user.credits !== null) {
-          user.credits += plusCredit;
+          user.credits += oneMessage.perMessage;
           await user.save();
         }
       }
