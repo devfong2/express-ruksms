@@ -2,46 +2,63 @@ import UserModel from "../models/user.model.js";
 import MessageModel from "../models/message.model.js";
 import UssdModel from "../models/ussd.model.js";
 import DeviceModel from "../models/device.model.js";
-//import { log } from "handlebars";
 // import SubscriptionModel from "../models/subscription.model.js";
 export default (req) => {
   // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve) => {
     const user = await UserModel.findById(req.user._id);
     let count;
-
     if (user.isAdmin === 1) {
       const [
-        messageGroup,
+        messagesPending,
+        messagesScheduled,
+        messagesQueued,
+        messagesSent,
+        messagesFailed,
+        messagesReceived,
         ussdPending,
         ussdSent,
         users,
         deviceInQueued,
         // Income,
       ] = await Promise.all([
-        MessageModel.aggregate([
-          { $group: { _id: "$status", count: { $sum: 1 } } },
-        ]),
-        UssdModel.countDocuments({
+        MessageModel.find({
+          status: "Pending",
+        }).countDocuments(),
+        MessageModel.find({
+          status: "Scheduled",
+        }).countDocuments(),
+        MessageModel.find({
+          status: "Queued",
+        }).countDocuments(),
+        MessageModel.find({
+          status: { $in: ["Sent", "Delivered"] },
+        }).countDocuments(),
+        MessageModel.find({
+          status: "Failed",
+        }).countDocuments(),
+        MessageModel.find({
+          status: "Received",
+        }).countDocuments(),
+        UssdModel.find({
           response: "รอดำเนินการ",
-        }),
-        UssdModel.countDocuments({
+        }).countDocuments(),
+        UssdModel.find({
           response: { $ne: "รอดำเนินการ" },
-        }),
-        UserModel.countDocuments({ isAdmin: { $ne: 1 } }),
+        }).countDocuments(),
+        UserModel.find({ isAdmin: { $ne: 1 } }).countDocuments(),
         findDeviceInQueued(req),
         // SubscriptionModel.find({ referenceNo: { $ne: null } }).select("amount"),
       ]);
       // let earning = 0;
       // Income.map((i) => (earning += i.amount));
-
       count = {
-        pending: findCountInMessageGroup(messageGroup, "Pending"),
-        scheduled: findCountInMessageGroup(messageGroup, "Scheduled"),
-        queued: findCountInMessageGroup(messageGroup, "Queued"),
-        sent: findCountInMessageGroup(messageGroup, "Sent"),
-        failed: findCountInMessageGroup(messageGroup, "Failed"),
-        received: findCountInMessageGroup(messageGroup, "Received"),
+        pending: messagesPending,
+        scheduled: messagesScheduled,
+        queued: messagesQueued,
+        sent: messagesSent,
+        failed: messagesFailed,
+        received: messagesReceived,
         ussdPending,
         ussdSent,
         credits: user.credits,
@@ -50,32 +67,58 @@ export default (req) => {
         // earning,
       };
     } else {
-      const [messageGroup, ussdPending, ussdSent, deviceInQueued] =
-        await Promise.all([
-          MessageModel.aggregate([
-            { $match: { user: req.user._id } },
-            { $group: { _id: "$status", count: { $sum: 1 } } },
-          ]),
-          UssdModel.count({
-            userID: req.user._id,
-            response: "รอดำเนินการ",
-          }),
-          UssdModel.count({
-            userID: req.user._id,
-            response: { $ne: "รอดำเนินการ" },
-          }),
-          findDeviceInQueued(req),
-        ]);
-
-      // const messageGroup = await ;
-
+      const [
+        messagesPending,
+        messagesScheduled,
+        messagesQueued,
+        messagesSent,
+        messagesFailed,
+        messagesReceived,
+        ussdPending,
+        ussdSent,
+        deviceInQueued,
+      ] = await Promise.all([
+        MessageModel.find({
+          user: req.user._id,
+          status: "Pending",
+        }).countDocuments(),
+        MessageModel.find({
+          user: req.user._id,
+          status: "Scheduled",
+        }).countDocuments(),
+        MessageModel.find({
+          user: req.user._id,
+          status: "Queued",
+        }).countDocuments(),
+        MessageModel.find({
+          user: req.user._id,
+          status: { $in: ["Sent", "Delivered"] },
+        }).countDocuments(),
+        MessageModel.find({
+          user: req.user._id,
+          status: "Failed",
+        }).countDocuments(),
+        MessageModel.find({
+          user: req.user._id,
+          status: "Received",
+        }).countDocuments(),
+        UssdModel.find({
+          userID: req.user._id,
+          response: "รอดำเนินการ",
+        }).countDocuments(),
+        UssdModel.find({
+          userID: req.user._id,
+          response: { $ne: "รอดำเนินการ" },
+        }).countDocuments(),
+        findDeviceInQueued(req),
+      ]);
       count = {
-        pending: findCountInMessageGroup(messageGroup, "Pending"),
-        scheduled: findCountInMessageGroup(messageGroup, "Scheduled"),
-        queued: findCountInMessageGroup(messageGroup, "Queued"),
-        sent: findCountInMessageGroup(messageGroup, "Sent"),
-        failed: findCountInMessageGroup(messageGroup, "Failed"),
-        received: findCountInMessageGroup(messageGroup, "Received"),
+        pending: messagesPending,
+        scheduled: messagesScheduled,
+        queued: messagesQueued,
+        sent: messagesSent,
+        failed: messagesFailed,
+        received: messagesReceived,
         ussdPending,
         ussdSent,
         credits: user.credits,
@@ -94,42 +137,34 @@ export default (req) => {
   });
 };
 
-const findCountInMessageGroup = (messageGroup, key) => {
-  const result = messageGroup.find((i) => i._id === key);
-  if (result) {
-    return result.count;
-  } else {
-    return 0;
-  }
-};
-
 const findDeviceInQueued = (req) => {
   // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
     try {
       const group = await MessageModel.aggregate([
-        { $match: { status: "Queued", user: req.user._id } },
-        { $group: { _id: "$deviceID", count: { $sum: 1 } } },
-        { $sort: { deviceID: 1 } },
+        { $match: { user: req.user._id, status: "Queued" } },
+        { $group: { _id: "$groupID" } },
       ]);
-      const devices = await Promise.all(
-        group.map((g) =>
-          DeviceModel.findOne({ ID: g._id }).select("ID name model")
-        )
-      );
-      // console.log(devices);
       const data = [];
-      // console.log(group);
-      group.map((g, i) =>
+      for (let i = 0; i < group.length; i++) {
+        const device = await DeviceModel.findById(group[i]._id.split(".")[1]);
+
+        const mess = await MessageModel.countDocuments({
+          status: "Queued",
+          user: req.user._id,
+          groupID: group[i]._id,
+        });
+
         data.push({
-          value: g.count,
+          value: mess,
           color: "linear-gradient(to bottom, #fdb954, #fbe05f)",
           icon: "mdi-clock-time-seven-outline",
-          title: devices[i].name || devices[i].model,
-          deviceID: devices[i].ID,
-        })
-      );
-
+          title: device.name || device.model,
+          deviceID: device.ID,
+        });
+      }
+      data.sort((a, b) => a.deviceID - b.deviceID);
+      // console.log(group);
       resolve(data);
     } catch (e) {
       reject(e);

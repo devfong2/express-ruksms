@@ -1,7 +1,7 @@
 import MessageModel from "./../../models/message.model.js";
 import UserModel from "../../models/user.model.js";
 import { decryptData } from "../../utilities/cryptoJs.js";
-import updateDashboard from "../../utilities/update-dashboard.js";
+// import updateDashboard from "../../utilities/update-dashboard.js";
 export default async (req, res, next) => {
   try {
     console.log("=======get-message=====");
@@ -48,7 +48,7 @@ export default async (req, res, next) => {
 
     console.log("=======get-message=====");
     req.user = { _id: user._id };
-    waitTimeForUpdateFromQueueToSent(messages, req);
+    waitTimeForUpdateFromQueueToSent(messages);
     res.json({
       success: true,
       data: {
@@ -62,7 +62,7 @@ export default async (req, res, next) => {
   }
 };
 
-const waitTimeForUpdateFromQueueToSent = (messages, req) => {
+const waitTimeForUpdateFromQueueToSent = (messages) => {
   const timer = setTimeout(async () => {
     // await Promise.all(
     //   messages.map((m) =>
@@ -77,9 +77,9 @@ const waitTimeForUpdateFromQueueToSent = (messages, req) => {
       { status: "Sent", sentDate: new Date() }
     );
 
-    await updateDashboard(req);
+    // await updateDashboard(req);
     clearTimeout(timer);
-  }, 1000 * 120);
+  }, 1000 * 300);
 };
 
 const decodeData = async (messages, secret) => {

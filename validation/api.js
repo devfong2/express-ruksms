@@ -8,6 +8,8 @@ export const checkQueryGetMessage = [
   query("limit")
     .isFloat({ min: 25, max: 200 })
     .withMessage("limit must be between 25 to 200"),
+  query("sort").not().isEmpty().withMessage("sort is required"),
+  query("sort").isIn(["asc", "desc"]).withMessage("sort must be asc or desc"),
 ];
 
 export const checkStatusMessage = (arrStatus) => {

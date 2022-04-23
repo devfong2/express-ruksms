@@ -5,8 +5,9 @@ const capitalize = (str) => str[0].toUpperCase() + str.slice(1);
 
 export default async (req, res, next) => {
   try {
-    const { page, limit, status } = req.query;
+    const { page, limit, status, sort } = req.query;
     const query = { user: req.user._id };
+    const sortObj = { sentDate: sort === "asc" ? 1 : -1 };
     // console.log(limit);
 
     if (status !== "all") {
@@ -16,6 +17,7 @@ export default async (req, res, next) => {
     const result = await Promise.all([
       messageModel
         .find(query)
+        .sort(sortObj)
         .select(
           " -expiryDate -_id -retries -user -device -type -attachments -prioritize -customer -__v -groupID -messageLength -perMessage"
         )
