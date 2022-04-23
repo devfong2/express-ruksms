@@ -5,6 +5,7 @@ import checkValidate, {
   checkTypeInParam,
   sendMessageValidation,
 } from "../../validation/index.js";
+import resendMessage from "./resend-message.js";
 
 const agentRoute = Router();
 agentRoute.get("/", (req, res) => {
@@ -20,7 +21,7 @@ agentRoute.post(
   [sendMessageValidation, checkValidate],
   messageController.sendMessage
 );
-agentRoute.post("/resend-message", messageController.resendMessage);
+agentRoute.post("/resend-message", resendMessage);
 agentRoute.post(
   "/fetch-message",
   [checkFetchMessage, checkValidate],

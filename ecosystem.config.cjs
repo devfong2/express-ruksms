@@ -4,7 +4,7 @@ module.exports = {
     {
       name: "express-ruksms",
       exec_mode: "cluster_mode",
-      instances: "2", // Or a number of instances
+      instances: "max", // Or a number of instances
       script: "index.js",
     },
   ],

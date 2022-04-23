@@ -20,7 +20,7 @@ export default async (req, res, next) => {
       user: req.user._id,
     });
     if (!token) {
-      const err = new Error("Unknown token");
+      const err = new Error("Unknown token.Please check your agent token");
       err.statusCode = 404;
       throw err;
     }
