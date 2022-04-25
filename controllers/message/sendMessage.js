@@ -29,7 +29,12 @@ export default async (req, res, next, api = false, fromAgentResend = false) => {
       user: user._id,
       status: "Pending",
     });
-    if (!user.subscription.planID.agent && PendingMessage > 0) {
+    console.log(req.user.subscription);
+    if (
+      req.user.subscription &&
+      !user.subscription.planID.agent &&
+      PendingMessage > 0
+    ) {
       throw new Error(
         "Please wait for the message that you have sent earlier. send successfully first"
       );
