@@ -36,8 +36,9 @@ app.use(express.json({ limit: "256mb" }));
 app.use(express.urlencoded({ limit: "256mb", extended: false }));
 app.use(passport.initialize());
 app.use(express.static(rootPath));
+app.set("views", "./views");
 app.set("view engine", "ejs");
-
+// console.log(rootPath);
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {

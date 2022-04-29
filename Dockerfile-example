@@ -1,0 +1,14 @@
+FROM node:16.14.2
+
+WORKDIR /app
+
+COPY ./package.json ./
+COPY ./yarn.lock ./
+
+RUN yarn install
+
+COPY . .
+
+EXPOSE 4000
+
+CMD [ "index.js" ]

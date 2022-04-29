@@ -1,31 +1,52 @@
-version: "3"
+version: "3.8"
 services:
-  nuxt-app:
-    image: nuxt-ruksms
-    stdin_open: true
-    ports:
-      - "3000:3000"
+  mongodb:
+    image: mongo:5.0.7
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin
     networks:
-      - ruksms
-  api-server:
-    image: express-ruksms
-    ports:
-      - "4000:4000"
-    networks:
-      - ruksms
-    depends_on:
-      - mongo
-  mongo:
-    image: mongo:3.6.19-xenial
-    ports:
-      - "27017:27017"
-    networks:
-      - ruksms
+      - mongo-network
     volumes:
-      - mongo-data:/data/db
+      - mongo-volume:/data/db
+  mongo-express:
+    image: mongo-express
+    ports:
+      - 8081:8081
+    environment:
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=admin
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=admin
+      - ME_CONFIG_MONGODB_SERVER=mongodb
+      - ME_CONFIG_OPTIONS_EDITORTHEME=yonce
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=admin
+    networks:
+      - mongo-network
+    depends_on:
+      - mongodb
+  api:
+    image: ruksms-api:1.0
+    ports:
+      - 4001:4000
+    networks:
+      - mongo-network
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/ruksms-dev
+      - MONGO_PASSWORD=admin
+      - MONGO_USERNAME=admin
+      - SOCKET_IO_CORS=http://ui
+  ui:
+    image: ruksms-ui:1.0
+    ports:
+      - 3000:3000
+    environment:
+      - BASE_URL=http://ui:3000/services
+      - SERVER_HOST=http://api:4000
+      - IP=http://ui:3000
+
 networks:
-  ruksms:
+  mongo-network:
     driver: bridge
 volumes:
-  mongo-data:
+  mongo-volume:
     driver: local

@@ -1,5 +1,6 @@
 import * as dotenv from "dotenv";
-dotenv.config();
+import path from "path";
+dotenv.config({ path: path.join(path.resolve(), ".env.dev") });
 
 // eslint-disable-next-line no-undef
 const env = process.env;
@@ -7,9 +8,10 @@ export default {
   PORT: 4000,
   MONGODB: {
     // *important: use your own mongodb url
-    URI: env.MONGO_URI_DEV,
+    URI: env.MONGO_URI,
     PASSWORD: env.MONGO_PASSWORD,
-    USERNAME: "admin",
+    USERNAME: env.MONGO_USERNAME,
+    AUTHEN: env.MONGO_AUTHEN || "true",
   },
   GATEWAY: {
     FCM: env.GOOGLE_FCM,
@@ -19,7 +21,7 @@ export default {
   },
   JWT_SECRET: env.JWT_SECRET,
   // *important: use your website url
-  IO_CORS: env.SOCKET_IO_CORS_DEV,
+  IO_CORS: env.SOCKET_IO_CORS,
   GOOGLE_RECAPTCHA_SECRET_KEY: env.GOOGLE_RECAPTCHA_SECRET_KEY,
   SERVER_URL: "https://api.ruksms.com",
   DATA_SECRET: env.DATA_SECRET,
