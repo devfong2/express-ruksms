@@ -24,12 +24,13 @@ export default async (req, res, next, api = false, fromAgentResend = false) => {
       customer,
       idForRemove,
       status,
+      userDelay,
     } = req.body;
     const PendingMessage = await MessageModel.countDocuments({
       user: user._id,
       status: "Pending",
     });
-    console.log(req.user.subscription);
+    // console.log(req.user.subscription);
     if (
       req.user.subscription &&
       !user.subscription.planID.agent &&
@@ -39,7 +40,6 @@ export default async (req, res, next, api = false, fromAgentResend = false) => {
         "Please wait for the message that you have sent earlier. send successfully first"
       );
     }
-    // เช็คเครดิต
     let present;
     let timeForSend;
     if (schedule) {
@@ -54,6 +54,7 @@ export default async (req, res, next, api = false, fromAgentResend = false) => {
       // console.log(timeForSend.diff(present, "minutes"));
     }
 
+    // *เช็คเครดิต
     if (
       user.isAdmin !== 1 &&
       user.credits !== null &&
@@ -63,7 +64,7 @@ export default async (req, res, next, api = false, fromAgentResend = false) => {
       err.statusCode = 402;
       throw err;
     }
-    //เช็คสถานะเครื่อง
+    //*เช็คสถานะเครื่อง
     for (let i = 0; i < senders.length; i++) {
       const device = await DeviceModel.findOne({
         _id: senders[i].device,
@@ -72,13 +73,13 @@ export default async (req, res, next, api = false, fromAgentResend = false) => {
       await checkDeviceBeforeSend(device, senders[i].simSlot);
     }
 
-    // หาไอดี
+    //*หาไอดี
     const maxMessageId = await SettingModel.findOne({ name: "maxMessageId" });
     let maxMessageIdValue = maxMessageId.value;
     maxMessageId.value = maxMessageIdValue + messages.length + 1;
     await maxMessageId.save();
-    // group id  message footer
 
+    // *group id  message footer
     const [newUser, groupID] = await Promise.all([
       SettingModel.findOne({ name: "newUser" }),
       generateGroupID(50),
@@ -144,7 +145,8 @@ export default async (req, res, next, api = false, fromAgentResend = false) => {
         totalCredits,
         req,
         customer,
-        perMessage
+        perMessage,
+        userDelay
       );
     } else {
       checkCountDeviceAndSend(
@@ -153,7 +155,8 @@ export default async (req, res, next, api = false, fromAgentResend = false) => {
         senders,
         prioritize,
         customer,
-        perMessage
+        perMessage,
+        userDelay
       );
       if (user.credits !== null) {
         const currentCredit = user.credits - messages.length * perMessage;
