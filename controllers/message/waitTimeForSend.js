@@ -11,7 +11,8 @@ export default (
   totalCredits,
   req,
   customer,
-  perMessage
+  perMessage,
+  userDelayFromAgent
 ) => {
   const timer = setTimeout(async () => {
     await MessageModel.updateMany(
@@ -24,7 +25,8 @@ export default (
       senders,
       prioritize,
       customer,
-      perMessage
+      perMessage,
+      userDelayFromAgent
     );
     if (user.credits !== null) {
       const currentCredit = user.credits - totalCredits;

@@ -6,6 +6,7 @@ import checkValidate, {
   sendMessageValidation,
 } from "../../validation/index.js";
 import resendMessage from "./resend-message.js";
+import sendMessage from "./send-message.js";
 
 const agentRoute = Router();
 agentRoute.get("/", (req, res) => {
@@ -19,7 +20,7 @@ agentRoute.get("/", (req, res) => {
 agentRoute.post(
   "/send-message",
   [sendMessageValidation, checkValidate],
-  messageController.sendMessage
+  sendMessage
 );
 agentRoute.post("/resend-message", resendMessage);
 agentRoute.post(
