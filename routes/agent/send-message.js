@@ -187,7 +187,7 @@ const sendMessageFollowRoundAbout = async (
   let timer = 0;
   if (roundabout === "hour") {
     // timer = 60*60
-    timer = 10 * 1000;
+    timer = 60 * 60 * 1000;
   } else if (roundabout === "day") {
     timer = 60 * 1000 * 60 * 24;
   }
