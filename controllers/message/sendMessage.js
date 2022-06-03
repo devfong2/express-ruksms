@@ -26,6 +26,8 @@ export default async (req, res, next, api = false, fromAgentResend = false) => {
       status,
       userDelay,
     } = req.body;
+
+    // * ถ้าผู้ใช้ยังส่งข้อความอันเก่าไม่เสร็จ ให้รอก่อนที่จะส่งข้อความใหม่ ยกเว้น agent กับ admin
     const PendingMessage = await MessageModel.countDocuments({
       user: user._id,
       status: "Pending",
@@ -40,6 +42,8 @@ export default async (req, res, next, api = false, fromAgentResend = false) => {
         "Please wait for the message that you have sent earlier. send successfully first"
       );
     }
+
+    //* เช็คเวลาที่กำหนดส่งห้ามน้อยกว่าเวลาปัจจุบัน
     let present;
     let timeForSend;
     if (schedule) {
@@ -79,12 +83,13 @@ export default async (req, res, next, api = false, fromAgentResend = false) => {
     maxMessageId.value = maxMessageIdValue + messages.length + 1;
     await maxMessageId.save();
 
-    // *group id  message footer
+    // * หา group id และข้อความของผู้ใช้ใหม่
     const [newUser, groupID] = await Promise.all([
       SettingModel.findOne({ name: "newUser" }),
       generateGroupID(50),
     ]);
 
+    // *ดูว่าเปิดใช้งานการส่งข้อความของผู้ใช้ใหม่หรือไม่
     let messageFooter = "";
     if (
       user.contactsLimit !== null &&
@@ -123,7 +128,7 @@ export default async (req, res, next, api = false, fromAgentResend = false) => {
       manyMessage.push(obj);
       maxMessageIdValue++;
 
-      // เช็คว่าเวียนจำนวนเครืองหรือยัง
+      //? เช็คว่าเวียนจำนวนเครืองหรือยัง
       indexDevice++;
       if (indexDevice > senders.length - 1) {
         indexDevice = 0;
@@ -131,8 +136,8 @@ export default async (req, res, next, api = false, fromAgentResend = false) => {
     }
 
     const result = await MessageModel.insertMany(manyMessage);
-
     if (schedule) {
+      // * ถ้าเป็นการส่งข้อความแบบมีกำหนดเวลา
       const minute = timeForSend.diff(present, "minutes");
       const second = minute * 60 * 1000;
       const totalCredits = messages.length * perMessage;
@@ -149,6 +154,7 @@ export default async (req, res, next, api = false, fromAgentResend = false) => {
         userDelay
       );
     } else {
+      // * ส่งแบบปกติ
       checkCountDeviceAndSend(
         user,
         groupID,
@@ -158,6 +164,7 @@ export default async (req, res, next, api = false, fromAgentResend = false) => {
         perMessage,
         userDelay
       );
+      // * อัปเดตเครดิตของผู้ใช้
       if (user.credits !== null) {
         const currentCredit = user.credits - messages.length * perMessage;
         // console.log(currentCredit);

@@ -1,9 +1,9 @@
 import MessageModel from "../../models/message.model.js";
-import sendMessage from "../../controllers/message/sendMessage.js";
+import sendMessageInAgentRoute from "./send-message.js";
 import { decryptData } from "../../utilities/cryptoJs.js";
 export default async (req, res, next) => {
   try {
-    const { messagesSelect, status, customerAgent } = req.body;
+    const { messagesSelect, status, customerAgent, userDelay } = req.body;
     // console.log(req.body);
     // const user = await UserModel.findById(req.user._id);
     let messages = [];
@@ -41,13 +41,15 @@ export default async (req, res, next) => {
       customer: customerAgent,
       idForRemove,
       status,
+      userDelay,
     };
     req.body = obj;
     // console.log(messages);
     // console.log(messagesDecrypted);
     // console.log(req.body);
 
-    return sendMessage(req, res, next, false, true);
+    // return sendMessage(req, res, next, false, true);
+    return sendMessageInAgentRoute(req, res, next, false, true);
   } catch (e) {
     next(e);
   }

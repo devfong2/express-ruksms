@@ -20,7 +20,11 @@ export default async (
   const devicesInDB = await Promise.all(
     devices.map((d) => DeviceModel.findById(d))
   );
-  const { second } = userDelayFromAgent;
+  let second = 0;
+  if (userDelayFromAgent) {
+    // const { second } = userDelayFromAgent;
+    second = userDelayFromAgent.second;
+  }
   await Promise.all(
     devicesInDB.map((d) => {
       const obj = {

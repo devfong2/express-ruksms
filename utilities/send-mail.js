@@ -5,7 +5,7 @@ import SettingModel from "../models/setting.model.js";
 export default async (title, recipient, html) => {
   const mail = await SettingModel.findOne({ name: "mail" });
   // eslint-disable-next-line no-async-promise-executor
-  return new Promise(async (resolve, reject) => {
+  return new Promise(async (resolve) => {
     try {
       let transporter = nodemailer.createTransport({
         host: mail.value.host,
@@ -24,7 +24,7 @@ export default async (title, recipient, html) => {
       });
       resolve(info);
     } catch (e) {
-      reject(e);
+      resolve(e);
     }
   });
 };

@@ -1,5 +1,7 @@
 import * as dotenv from "dotenv";
 import path from "path";
+
+// ! อย่าลืมปิดการทำงานของคำสั่งนี้
 dotenv.config({ path: path.join(path.resolve(), ".env.dev") });
 
 // eslint-disable-next-line no-undef
@@ -11,7 +13,6 @@ export default {
     URI: env.MONGO_URI,
     PASSWORD: env.MONGO_PASSWORD,
     USERNAME: env.MONGO_USERNAME,
-    AUTHEN: env.MONGO_AUTHEN || "true",
   },
   GATEWAY: {
     FCM: env.GOOGLE_FCM,

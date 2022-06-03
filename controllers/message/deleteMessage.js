@@ -20,7 +20,7 @@ export default async (req, res, next) => {
           user: user,
           ...query,
         });
-        console.log("delete \n", user, query);
+        // console.log("delete \n", user, query);
       } else {
         result = await MessageModel.deleteMany({
           user: req.user._id,

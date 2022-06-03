@@ -6,28 +6,35 @@ import checkDeviceBeforeSend from "../../utilities/check-device-before-send.js";
 import messageCon from "./../../controllers/message/index.js";
 import { generateGroupID } from "../../utilities/generate-api-key.js";
 import MessageModel from "../../models/message.model.js";
+import activity from "../../utilities/activity.js";
 import processUssdRequest from "../../utilities/send-ussd.js";
-export default (req, res, next) => {
+export default (req, res, next, fromApi = false, fromAgentResend = false) => {
   try {
     const { userDelay } = req.body;
-    console.log(userDelay);
+    // console.log(userDelay);
     const { delay, type } = userDelay;
     if (delay) {
       if (type === 1) {
-        return messageCon.sendMessage(req, res, next);
+        return messageCon.sendMessage(req, res, next, fromApi, fromAgentResend);
       } else if (type === 2) {
-        return sendMessageController(req, res, next);
+        return sendMessageController(req, res, next, fromAgentResend);
       }
     } else {
       req.body.userDelay.second = 2;
-      return messageCon.sendMessage(req, res, next);
+      return messageCon.sendMessage(req, res, next, fromApi, fromAgentResend);
     }
   } catch (e) {
     next(e);
   }
 };
 
-const sendMessageController = async (req, res, next) => {
+const sendMessageController = async (
+  req,
+  res,
+  next,
+
+  fromAgentResend = false
+) => {
   try {
     const { user } = req;
     const {
@@ -38,6 +45,8 @@ const sendMessageController = async (req, res, next) => {
       messages,
       customer,
       userDelay,
+      idForRemove,
+      status,
     } = req.body;
     let present;
     let timeForSend;
@@ -137,6 +146,17 @@ const sendMessageController = async (req, res, next) => {
         user
       );
     }
+    if (fromAgentResend) {
+      await Promise.all([
+        MessageModel.deleteMany({ _id: { $in: idForRemove } }),
+        await activity(
+          req,
+          `ส่งข้อความสถานะ ${status} จำนวน ${messages.length} ข้อความ อีกครั้ง`
+        ),
+      ]);
+    } else {
+      await activity(req, `ส่งข้อความ ${result.length} ข้อความ`);
+    }
     res.status(200).json({
       success: true,
       data: result,
@@ -187,10 +207,14 @@ const sendMessageFollowRoundAbout = async (
   let timer = 0;
   if (roundabout === "hour") {
     // timer = 60*60
+    // * 1 hour
     timer = 60 * 60 * 1000;
+    // timer = 10000;
   } else if (roundabout === "day") {
+    // * 1 day
     timer = 60 * 1000 * 60 * 24;
   }
+  console.log(timer);
   for (let i = 0; i < round; i++) {
     const end = i * count + count;
     const start = i * count;
@@ -221,7 +245,7 @@ const waitForTheAniversary = async (
   groupID,
   user
 ) => {
-  console.log(messagesForSend.map((item) => item._id));
+  // console.log(messagesForSend.map((item) => item._id));
   await MessageModel.updateMany(
     {
       _id: { $in: messagesForSend.map((item) => item._id) },
