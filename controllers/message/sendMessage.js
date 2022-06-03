@@ -11,22 +11,35 @@ import waitTimeForSend from "./waitTimeForSend.js";
 import checkCountDeviceAndSend from "./checkCountDeviceAndSend.js";
 import { encryptData } from "../../utilities/cryptoJs.js";
 
-export default async (req, res, next, api = false) => {
+export default async (req, res, next, api = false, fromAgentResend = false) => {
   try {
     // console.log(api);
     const { user } = req;
-    const { messages, prioritize, senders, schedule, perMessage, customer } =
-      req.body;
+    const {
+      messages,
+      prioritize,
+      senders,
+      schedule,
+      perMessage,
+      customer,
+      idForRemove,
+      status,
+      userDelay,
+    } = req.body;
     const PendingMessage = await MessageModel.countDocuments({
       user: user._id,
       status: "Pending",
     });
-    if (!user.subscription.planID.agent && PendingMessage > 0) {
+    // console.log(req.user.subscription);
+    if (
+      req.user.subscription &&
+      !user.subscription.planID.agent &&
+      PendingMessage > 0
+    ) {
       throw new Error(
         "Please wait for the message that you have sent earlier. send successfully first"
       );
     }
-    // เช็คเครดิต
     let present;
     let timeForSend;
     if (schedule) {
@@ -41,6 +54,7 @@ export default async (req, res, next, api = false) => {
       // console.log(timeForSend.diff(present, "minutes"));
     }
 
+    // *เช็คเครดิต
     if (
       user.isAdmin !== 1 &&
       user.credits !== null &&
@@ -50,7 +64,7 @@ export default async (req, res, next, api = false) => {
       err.statusCode = 402;
       throw err;
     }
-    //เช็คสถานะเครื่อง
+    //*เช็คสถานะเครื่อง
     for (let i = 0; i < senders.length; i++) {
       const device = await DeviceModel.findOne({
         _id: senders[i].device,
@@ -59,13 +73,13 @@ export default async (req, res, next, api = false) => {
       await checkDeviceBeforeSend(device, senders[i].simSlot);
     }
 
-    // หาไอดี
+    //*หาไอดี
     const maxMessageId = await SettingModel.findOne({ name: "maxMessageId" });
     let maxMessageIdValue = maxMessageId.value;
     maxMessageId.value = maxMessageIdValue + messages.length + 1;
     await maxMessageId.save();
-    // group id  message footer
 
+    // *group id  message footer
     const [newUser, groupID] = await Promise.all([
       SettingModel.findOne({ name: "newUser" }),
       generateGroupID(50),
@@ -81,40 +95,9 @@ export default async (req, res, next, api = false) => {
     }
 
     let indexDevice = 0;
-    // const encryptMessage = await encryptData(
-    //   messages[0].message + messageFooter,
-    //   user.apiKey
-    // );
 
     const manyMessage = [];
-    // messages.map((m) => {
-    //   const obj = {
-    //     ID: maxMessageIdValue,
-    //     number: m.number,
-    //     message: encryptMessage,
-    //     groupID: `${groupID}.${senders[indexDevice].device}`,
-    //     prioritize: parseInt(prioritize),
-    //     userID: req.user.ID,
-    //     user: req.user._id,
-    //     deviceID: senders[indexDevice].deviceID,
-    //     device: senders[indexDevice].device,
-    //     simSlot: senders[indexDevice].simSlot,
-    //     status: schedule ? "Scheduled" : "Pending",
-    //     schedule: schedule ? schedule : null,
-    //     sentDate: schedule ? schedule : new Date(),
-    //     perMessage: parseInt(perMessage),
-    //     messageLength: m.message.length,
-    //     customer: customer ? customer : null,
-    //   };
-    //   manyMessage.push(obj);
-    //   maxMessageIdValue++;
 
-    //   // เช็คว่าเวียนจำนวนเครืองหรือยัง
-    //   indexDevice++;
-    //   if (indexDevice > senders.length - 1) {
-    //     indexDevice = 0;
-    //   }
-    // });
     for (let i = 0; i < messages.length; i++) {
       const obj = {
         ID: maxMessageIdValue,
@@ -162,7 +145,8 @@ export default async (req, res, next, api = false) => {
         totalCredits,
         req,
         customer,
-        perMessage
+        perMessage,
+        userDelay
       );
     } else {
       checkCountDeviceAndSend(
@@ -171,7 +155,8 @@ export default async (req, res, next, api = false) => {
         senders,
         prioritize,
         customer,
-        perMessage
+        perMessage,
+        userDelay
       );
       if (user.credits !== null) {
         const currentCredit = user.credits - messages.length * perMessage;
@@ -186,6 +171,19 @@ export default async (req, res, next, api = false) => {
     ]);
     // await updateDashboard(req);
     // await activity(req, `ส่งข้อความ ${result.length} ข้อความ`);
+
+    // * ส่งอีกครั้งจาก web agent
+    if (fromAgentResend) {
+      await Promise.all([
+        MessageModel.deleteMany({ _id: { $in: idForRemove } }),
+        await activity(
+          req,
+          `ส่งข้อความสถานะ ${status} จำนวน ${messages.length} ข้อความ อีกครั้ง`
+        ),
+      ]);
+    }
+
+    // * รูปแบบ json
     let resultPresend = [];
     if (api) {
       // const resultApi = []
@@ -213,6 +211,7 @@ export default async (req, res, next, api = false) => {
       error: null,
     });
   } catch (e) {
+    // console.log(e);
     next(e);
   }
 };

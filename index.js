@@ -8,7 +8,7 @@ import { createServer } from "http";
 import config from "./config/index.js";
 import connectDatabase from "./database/index.js";
 import errorHandler from "./middlewares/errorHandler.js";
-import routesRuksm from "./routes/ruksms/index.js";
+import routesRuksms from "./routes/ruksms/index.js";
 import checkScheduleAndSetTimeOut from "./utilities/checkScheduleAndSetTimeOut.js";
 import autoSendUssd from "./utilities/auto-send-ussd.js";
 import autoSendMessage from "./utilities/autoSendMessage.js";
@@ -36,8 +36,9 @@ app.use(express.json({ limit: "256mb" }));
 app.use(express.urlencoded({ limit: "256mb", extended: false }));
 app.use(passport.initialize());
 app.use(express.static(rootPath));
+app.set("views", "./views");
 app.set("view engine", "ejs");
-
+// console.log(rootPath);
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
@@ -54,7 +55,7 @@ app.get("/", (req, res) => {
   res.render("index");
 });
 // app.use(visite);
-app.use("/", routesRuksm);
+app.use("/", routesRuksms);
 app.use("/agent", agentCheck, checkUser, chekToken, agentRoute);
 app.use("/v1", cors(), apiCheck, apiRoute);
 app.use("*", notFound);

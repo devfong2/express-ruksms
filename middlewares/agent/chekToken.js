@@ -14,13 +14,14 @@ export default async (req, res, next) => {
       err.statusCode = 404;
       throw err;
     }
+    // console.log(authorization);
     const agent = jwt.verify(authorization.split(" ")[1], req.user.apiKey);
     const token = await ApiKeyModel.findOne({
       token: authorization.split(" ")[1],
       user: req.user._id,
     });
     if (!token) {
-      const err = new Error("Unknown token");
+      const err = new Error("Unknown token.Please check your agent token");
       err.statusCode = 404;
       throw err;
     }

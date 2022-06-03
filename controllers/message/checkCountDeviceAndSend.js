@@ -6,7 +6,8 @@ export default async (
   senders,
   prioritize,
   customer,
-  perMessage
+  perMessage,
+  userDelayFromAgent
 ) => {
   const devices = [];
   senders.map((s) => {
@@ -19,11 +20,11 @@ export default async (
   const devicesInDB = await Promise.all(
     devices.map((d) => DeviceModel.findById(d))
   );
-
+  const { second } = userDelayFromAgent;
   await Promise.all(
     devicesInDB.map((d) => {
       const obj = {
-        delay: customer ? perMessage * 2 : user.delay, // from user and agent customer
+        delay: customer ? perMessage * second : user.delay, // from user and agent customer
         groupId: `${groupID}.${d._id}`,
         prioritize,
         reportDelivery: user.reportDelivery, // from user

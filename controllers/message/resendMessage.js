@@ -6,18 +6,18 @@ import activity from "../../utilities/activity.js";
 import processUssdRequest from "../../utilities/send-ussd.js";
 export default async (req, res, next) => {
   try {
-    const { messagesSelect, status, customerAgent } = req.body;
+    const { messagesSelect, status } = req.body;
     const user = await UserModel.findById(req.user._id);
     let messages = [];
     if (status === "selected") {
-      if (customerAgent) {
-        messages = await MessageModel.find({
-          _id: { $in: messagesSelect.map((m) => m._id) },
-        });
-        // console.log(messages);
-      } else {
-        messages = messagesSelect;
-      }
+      // if (customerAgent) {
+      //   messages = await MessageModel.find({
+      //     _id: { $in: messagesSelect.map((m) => m._id) },
+      //   });
+      //   // console.log(messages);
+      // } else {
+      messages = messagesSelect;
+      // }
     } else {
       messages = await MessageModel.find({
         user: req.user._id,
@@ -61,7 +61,7 @@ export default async (req, res, next) => {
         status: "Pending",
         schedule: null,
         sentDate: new Date(),
-        customer: customerAgent ? customerAgent : null,
+        customer: null,
         perMessage: m.perMessage,
         messageLength: m.messageLength,
       };
