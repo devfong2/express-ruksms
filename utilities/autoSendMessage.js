@@ -3,7 +3,7 @@ import DeviceModel from "../models/device.model.js";
 import UserModel from "../models/user.model.js";
 import processUssdRequest from "./send-ussd.js";
 import updateDashboard from "./update-dashboard.js";
-export default async (io, status = "Pending", user = "None") => {
+export default async (status = "Pending", user = "None") => {
   try {
     const query = {};
     query.status = status;
@@ -16,7 +16,7 @@ export default async (io, status = "Pending", user = "None") => {
       // totalGroup.map(async (group) => {
       //   await sendMessage(group, io);
       // });
-      await Promise.all(totalGroup.map((group) => sendMessage(group, io)));
+      await Promise.all(totalGroup.map((group) => sendMessage(group)));
     }
   } catch (e) {
     console.error(e);
@@ -45,7 +45,7 @@ const groupByGroupId = (messages) => {
   return group;
 };
 
-const sendMessage = async (group, io) => {
+const sendMessage = async (group) => {
   // const user = await UserModel.findById(group.message[0].user);
   // const device = await DeviceModel.findById(group.message[0].device);
   const [user, device] = await Promise.all([
@@ -64,9 +64,6 @@ const sendMessage = async (group, io) => {
   const req = {
     user: {
       _id: user._id,
-    },
-    app: {
-      io,
     },
   };
   // await updateDashboard(req);

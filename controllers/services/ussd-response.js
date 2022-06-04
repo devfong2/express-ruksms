@@ -22,7 +22,7 @@ export default async (req, res, next) => {
       },
       { new: true }
     );
-    req.app.io.emit("updateUssd", ussd);
+
     req.user = { _id: ussd.userID };
     await updateDashboard(req);
 

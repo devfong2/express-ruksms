@@ -114,11 +114,6 @@ export default async (req, res, next) => {
       `ชำระเงิน ${plan.name} สำเร็จ และเปลี่ยนเป็น ${plan.name} แล้ว`
     );
 
-    req.app.io.emit("paymentSuccess", {
-      userId: user._id,
-      referenceNo,
-    });
-
     res.json({
       success: true,
       data: null,

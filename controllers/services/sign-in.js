@@ -62,17 +62,9 @@ export default async (req, res, next) => {
       config.JWT_SECRET,
       { expiresIn: "1h" }
     );
-    req.app.io.emit("updateDevice", {
-      userId: user._id,
-      type: "signIn",
-      androidId: req.body.androidId,
-    });
+
     req.user = { _id: user._id };
     await activity(req, `อุปกรณ์ ${device.name || device.model} เข้าสู่ระบบ`);
-
-    // req.app.io.emit("mobileLogin", {
-    //   key: user.apiKey,
-    // });
 
     res.json({
       success: true,

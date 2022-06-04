@@ -4,7 +4,7 @@ import processUssdRequest from "./send-ussd.js";
 import MessageModel from "../models/message.model.js";
 import UserModel from "../models/user.model.js";
 import DeviceModel from "../models/device.model.js";
-export default async (io) => {
+export default async () => {
   try {
     const scheduledMessages = await MessageModel.find({
       status: "Scheduled",
@@ -22,14 +22,14 @@ export default async (io) => {
         const time = moment(group.message[0].schedule);
         // console.log(time.diff(moment(), "minutes"));
         const timeForsend = time.diff(moment(), "minutes");
-        waitTimeForSend(group, timeForsend * 60 * 1000, io);
+        waitTimeForSend(group, timeForsend * 60 * 1000);
       });
     }
     if (scheduledMessages2.length !== 0) {
       const totalGroup2 = groupByGroupId(scheduledMessages2);
       // console.log(totalGroup);
       totalGroup2.map((group) => {
-        waitTimeForSend(group, 1, io);
+        waitTimeForSend(group, 1);
       });
     }
   } catch (e) {
@@ -59,7 +59,7 @@ const groupByGroupId = (messages) => {
   return group;
 };
 
-const waitTimeForSend = async (group, second = 1, io) => {
+const waitTimeForSend = async (group, second = 1) => {
   const timer = setTimeout(async () => {
     await MessageModel.updateMany(
       { groupID: { $regex: ".*" + group.groupID + ".*" }, status: "Scheduled" },
@@ -84,9 +84,6 @@ const waitTimeForSend = async (group, second = 1, io) => {
     const req = {
       user: {
         _id: user._id,
-      },
-      app: {
-        io,
       },
     };
     await updateDashboard(req);
