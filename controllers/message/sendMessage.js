@@ -11,9 +11,15 @@ import waitTimeForSend from "./waitTimeForSend.js";
 import checkCountDeviceAndSend from "./checkCountDeviceAndSend.js";
 import { encryptData } from "../../utilities/cryptoJs.js";
 
-export default async (req, res, next, api = false, fromAgentResend = false) => {
+export default async (
+  req,
+  res,
+  next,
+  api = false,
+  fromAgentResendMessage = false
+) => {
   try {
-    // console.log(api);
+    // console.log(fromAgentSendMessage);
     const { user } = req;
     const {
       messages,
@@ -180,7 +186,7 @@ export default async (req, res, next, api = false, fromAgentResend = false) => {
     // await activity(req, `ส่งข้อความ ${result.length} ข้อความ`);
 
     // * ส่งอีกครั้งจาก web agent
-    if (fromAgentResend) {
+    if (fromAgentResendMessage) {
       await Promise.all([
         MessageModel.deleteMany({ _id: { $in: idForRemove } }),
         await activity(

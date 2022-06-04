@@ -1,5 +1,5 @@
 import MessageModel from "../../models/message.model.js";
-import sendMessageInAgentRoute from "./send-message.js";
+import sendMessageInAgentFolder from "./send-message.js";
 import { decryptData } from "../../utilities/cryptoJs.js";
 export default async (req, res, next) => {
   try {
@@ -44,12 +44,8 @@ export default async (req, res, next) => {
       userDelay,
     };
     req.body = obj;
-    // console.log(messages);
-    // console.log(messagesDecrypted);
-    // console.log(req.body);
 
-    // return sendMessage(req, res, next, false, true);
-    return sendMessageInAgentRoute(req, res, next, false, true);
+    return sendMessageInAgentFolder(req, res, next, false, true);
   } catch (e) {
     next(e);
   }

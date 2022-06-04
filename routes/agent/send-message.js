@@ -32,7 +32,6 @@ const sendMessageController = async (
   req,
   res,
   next,
-
   fromAgentResend = false
 ) => {
   try {
