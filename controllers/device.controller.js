@@ -110,7 +110,7 @@ const motivate = async (req, res, next) => {
       { user: req.user._id, status: "Queued", deviceID: req.body.deviceID },
       { status: "Pending" }
     );
-    autoSendMessage(req.app.io, "Pending", req.user._id);
+    autoSendMessage("Pending", req.user._id);
     await activity(req, "สั่งกระตุ้นข้อความ");
     const timer = setTimeout(() => {
       clearTimeout(timer);

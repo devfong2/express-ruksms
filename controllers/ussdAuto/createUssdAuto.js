@@ -64,7 +64,7 @@ export const waitTimeForSend = (ussdAuto, timeout, req, next) => {
         ussdAuto.status = "success";
         await ussdAuto.save();
       }
-      req.app.io.emit("updateUssdAuto", ussdAuto);
+
       clearTimeout(timer);
     }, timeout);
   } catch (e) {
@@ -117,9 +117,9 @@ export const sendManyTimes = async (ussdAuto, req, next) => {
         ussdAuto2.status = "success";
       }
       await ussdAuto2.save();
-      if (ussdAuto2.status !== "stop") {
-        req.app.io.emit("updateUssdAuto", ussdAuto2);
-      }
+      // if (ussdAuto2.status !== "stop") {
+
+      // }
       ussdAuto2 = await UssdAutoModel.findOne({
         _id: ussdAuto._id,
         status: { $ne: "stop" },

@@ -192,14 +192,14 @@ const setTimeOutToSendUssd = async (deviceToken, pendingUssdZero, req) => {
         simSlot: pendingUssdZero.simSlot,
       };
       //ส่งแล้วก้อเปลี่ยนสถานะ
-      const ussd = await UssdModel.findByIdAndUpdate(
+      await UssdModel.findByIdAndUpdate(
         pendingUssdZero._id,
         {
           response: "รอผลตอบกลับ",
         },
         { new: true }
       );
-      req.app.io.emit("updateUssd", ussd);
+
       const res = await processUssdRequest(deviceToken, data);
       const timer = setTimeout(() => {
         resolve(res);

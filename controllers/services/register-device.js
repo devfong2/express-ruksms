@@ -92,12 +92,6 @@ export default async (req, res, next) => {
       );
     }
 
-    req.app.io.emit("updateDevice", {
-      userId: user._id,
-      type: "newDevice",
-      device,
-    });
-
     res.json({
       success: true,
       data: {

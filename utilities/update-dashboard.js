@@ -128,11 +128,6 @@ export default (req) => {
     }
     // console.log(messagesPending);
 
-    // console.log(count);
-    req.app.io.emit("updateDashboard", {
-      userId: req.user._id,
-      count,
-    });
     resolve(count);
   });
 };

@@ -15,11 +15,6 @@ export default async (req, res) => {
   );
   // console.log(device);
   if (device) {
-    req.app.io.emit("updateDevice", {
-      userId: device.user,
-      type: "signOut",
-      androidId: req.body.androidId,
-    });
     req.user = { _id: device.user };
     await activity(req, `อุปกรณ์ ${device.name || device.model} ออกจากระบบ`);
   }
