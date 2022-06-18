@@ -109,6 +109,8 @@ export default async (
 
     const manyMessage = [];
 
+    const dateNow = new Date();
+
     for (let i = 0; i < messages.length; i++) {
       const obj = {
         ID: maxMessageIdValue,
@@ -126,7 +128,7 @@ export default async (
         simSlot: senders[indexDevice].simSlot,
         status: schedule ? "Scheduled" : "Pending",
         schedule: schedule ? schedule : null,
-        sentDate: schedule ? schedule : new Date(),
+        sentDate: schedule ? schedule : dateNow,
         perMessage: parseInt(perMessage),
         messageLength: messages[i].message.length,
         customer: customer ? customer : null,

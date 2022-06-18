@@ -89,6 +89,7 @@ const sendMessageController = async (
     const manyMessage = [];
 
     let indexDevice = 0;
+    const dateNow = new Date();
     for (let i = 0; i < messages.length; i++) {
       const obj = {
         ID: maxMessageIdValue,
@@ -103,7 +104,7 @@ const sendMessageController = async (
         simSlot: senders[indexDevice].simSlot,
         status: "Scheduled",
         schedule: schedule ? schedule : null,
-        sentDate: schedule ? schedule : new Date(),
+        sentDate: schedule ? schedule : dateNow,
         perMessage: parseInt(perMessage),
         messageLength: messages[i].message.length,
         customer: customer ? customer : null,
