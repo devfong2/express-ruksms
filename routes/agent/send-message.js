@@ -14,7 +14,7 @@ export default (req, res, next, fromApi = false, fromAgentResend = false) => {
     // console.log(userDelay);
     const { delay, type } = userDelay;
     if (delay) {
-      if (type === 1) {
+      if (type === 1 || type === 3) {
         return messageCon.sendMessage(req, res, next, fromApi, fromAgentResend);
       } else if (type === 2) {
         return sendMessageController(req, res, next, fromAgentResend);
