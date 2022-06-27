@@ -1,8 +1,6 @@
 import * as dotenv from "dotenv";
-import path from "path";
 
-// ! อย่าลืมปิดการทำงานของคำสั่งนี้
-dotenv.config({ path: path.join(path.resolve(), ".env.dev") });
+dotenv.config();
 
 // eslint-disable-next-line no-undef
 const env = process.env;
