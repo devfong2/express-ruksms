@@ -2,6 +2,12 @@ export default async (req, res, next) => {
   try {
     const { user } = req;
     // เช็คระบบ agent
+    if (!user.subscription) {
+      const err = new Error("You should buy an agent package from us");
+      err.statusCode = 402;
+      throw err;
+    }
+    // console.log(user);
     if (!user.subscription.planID.agent) {
       const err = new Error(
         "Your account is not authorized to use agent system"

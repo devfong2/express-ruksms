@@ -20,8 +20,10 @@ const startStopUssdAuto = async (req, res, next) => {
       const present = moment();
       const timeForSend = moment(result.schedule);
       if (timeForSend < present) {
+        //* เวลาส่งน้อยกว่าเวลาปัจจุบัน นำไปส่งข้อความเลย
         sendManyTimes(result, req, next);
       } else {
+        // * นำไปกำหนดเวลาส่งข้อความ
         const minute = timeForSend.diff(present, "minutes");
         const secondForSchedule = minute * 60 * 1000;
         waitTimeForSend(result, secondForSchedule, req, next);

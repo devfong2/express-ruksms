@@ -12,8 +12,12 @@ export default async (req, res, next) => {
       err.statusCode = 200;
       throw err;
     }
-    const user = await UserModel.findOne({ ID: userId });
-    const device = await DeviceModel.findOne({ androidId });
+
+    const [user, device] = await Promise.all([
+      UserModel.findOne({ ID: userId }),
+      DeviceModel.findOne({ androidId }),
+    ]);
+
     const ussd = await UssdModel.findOneAndUpdate(
       { ID: req.body.ussdId, deviceID: device._id, userID: user._id },
       {
@@ -22,6 +26,8 @@ export default async (req, res, next) => {
       },
       { new: true }
     );
+
+    // console.log("ussd", ussd);
 
     req.user = { _id: ussd.userID };
     await updateDashboard(req);

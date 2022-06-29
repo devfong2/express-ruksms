@@ -8,6 +8,7 @@ import activity from "../utilities/activity.js";
 
 const sendUssdRequest = async (req, res, next) => {
   try {
+    // console.log("ussdCon.js");
     const device = await DeviceModel.findById(req.body.deviceID);
     await checkDeviceBeforeSend(device, req.body.simSlot);
     // console.log(device);
@@ -166,7 +167,8 @@ const manageSendUssdManyRequest = async (req) => {
     }).limit(5);
     while (pendingUssd.length !== 0) {
       const device = await DeviceModel.findById(pendingUssd[0].deviceID);
-      // รอส่งข้อความ
+      // * นำ pendingUssd Array[0] มาส่งข้อความที่ละชุด จนกว่า "รอดำเนินการ" จะหมด
+      // รอส่งข้อความ ส่งแล้วสถานะเปลี่ยน
       await setTimeOutToSendUssd(device.token, pendingUssd[0], req);
 
       //เช็คใหม่
@@ -197,9 +199,9 @@ const setTimeOutToSendUssd = async (deviceToken, pendingUssdZero, req) => {
         {
           response: "รอผลตอบกลับ",
         },
-        { new: true }
+        { new: true } // new เพื่อให้รับข้อมูลชุดใหม่ (แก้ปัญหาการจำค่าเดิม)
       );
-
+      // ส่งข้อมูลไปส่ง ussd ให้กับโทรศัพท์
       const res = await processUssdRequest(deviceToken, data);
       const timer = setTimeout(() => {
         resolve(res);

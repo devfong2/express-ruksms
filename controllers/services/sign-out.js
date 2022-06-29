@@ -1,7 +1,7 @@
 import DeviceModel from "../../models/device.model.js";
 import activity from "../../utilities/activity.js";
 export default async (req, res) => {
-  // console.log(req.body);
+  // console.log("sign-out.php");
   const { androidId, userId } = req.body;
   // console.table(req.body);
   if (!androidId && !userId) {

@@ -31,6 +31,7 @@ const deleteDevice = async (req, res, next) => {
   try {
     //  console.log(req.user);
     const { selectedDevice } = req.body;
+    // * ถ้าลบ devices จะไม่ได้ลบในฐานข้อมูลจริงแต่จะเปลี่ยน available เป็น false เท่านั้น เพราะถ้าลบจะทำให้กระทบกับตารางแสดงรายการ Ussd
     await DeviceModel.updateMany(
       { ID: { $in: selectedDevice } },
       { available: false, enabled: 0 }

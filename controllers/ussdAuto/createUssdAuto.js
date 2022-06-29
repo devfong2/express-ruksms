@@ -7,6 +7,7 @@ import activity from "../../utilities/activity.js";
 
 export default async (req, res, next) => {
   try {
+    // console.log("createUssdAuto.js");
     let result;
     if (req.body.schedule) {
       const present = moment();
@@ -24,6 +25,7 @@ export default async (req, res, next) => {
         date: new Date(),
         status: "pending",
       });
+      // หาเวลาที่ตั้งส่งห่างกับเวลาปัจจุบันเท่าไหร่
       const minute = timeForSend.diff(present, "minutes");
       const secondForSchedule = minute * 60 * 1000;
       waitTimeForSend(result, secondForSchedule, req, next);
@@ -92,12 +94,13 @@ const sendUssdRequest = async (ussdAuto, seconds, next) => {
       ussdRequest: ussd.request,
       simSlot: ussd.simSlot,
     };
+
     const res = await processUssdRequest(device.token, data);
     return new Promise((resolve) => {
       const timer = setTimeout(() => {
         resolve(res);
         clearTimeout(timer);
-      }, seconds * 1000);
+      }, seconds * 1000); //เวลา delay timer(ระยะห่างระหว่างรอบ)
     });
   } catch (e) {
     next(e);
@@ -108,8 +111,9 @@ export const sendManyTimes = async (ussdAuto, req, next) => {
   try {
     let ussdAuto2 = await UssdAutoModel.findOne({
       _id: ussdAuto._id,
-      status: { $ne: "stop" },
+      status: { $ne: "stop" }, //ไม่เท่ากับ stop สถานะตรงการดำเนินการ
     });
+    //* ต้องมี ussdAuto2 และ roundรอบ ในฐานข้อมูล < times  จำนวนรอบผู้ใช้ป้อน (ระยะห่างระหว่างรอบ คือ timer)
     while (ussdAuto2 && ussdAuto2.round < ussdAuto2.times) {
       await sendUssdRequest(ussdAuto2, ussdAuto2.timer, next);
       ussdAuto2.round += 1;
