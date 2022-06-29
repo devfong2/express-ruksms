@@ -1,6 +1,7 @@
 import axios from "axios";
 import config from "../config/index.js";
 
+//* ส่ง Ussd ไปที่ cloud
 const processUssdRequest = (deviceToken, dataRequest) => {
   axios.defaults.baseURL = config.GATEWAY.FCM;
   axios.defaults.headers.common["Authorization"] = config.GATEWAY.KEY;
@@ -13,6 +14,7 @@ const processUssdRequest = (deviceToken, dataRequest) => {
         priority: "high",
         data: dataRequest,
       };
+      //* axios post data ไปที่ config.GATEWAY.FCM ข้างบน
       const result = await axios.post("", data);
       // const result = await axios({
       //   method: "post",
