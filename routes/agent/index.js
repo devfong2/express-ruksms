@@ -38,4 +38,8 @@ agentRoute.post("/delete-message", messageController.deleteMessage);
 // agentRoute.post("/delete", messageController.deleteMessage);
 // agentRoute.post("/search", messageController.searchMessage);
 // agentRoute.post("/resend", messageController.resendMessage);
+
+//* test connect agent
+agentRoute.post("/test-connect", messageController.testConnect);
+
 export default agentRoute;
